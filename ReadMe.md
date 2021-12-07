@@ -1,5 +1,5 @@
-# ANDI
-*Python librairy for controling the Analog Discovery 2 modul from digilent*
+# BIMMS
+*Python librairy for controling BIMMS*
 
 blablabla
 this is a test
@@ -13,10 +13,12 @@ pip install something
 
 # Requirements
 
-Third party software (Waveform) has to be installed before Andi installation. 
-Andi has been developped for python 3.
+Third party software (Waveform) has to be installed before BIMMS python API. 
+BIMMS has been developped for python 3.
 Recommended packages:
 - numpy
+- ...
+- ...
 
 
 for the third party softwares, please visit:
