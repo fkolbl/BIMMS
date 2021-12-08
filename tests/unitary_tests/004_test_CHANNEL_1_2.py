@@ -1,8 +1,6 @@
-import BIMMS as bm
+import bimms as bm
 import time
-import BIMMS_constants as cst
 import numpy as np
-import BIMMS_Measures as measures
 import matplotlib.pyplot as plt
 
 print('======== Channel 1 Test ========')
@@ -17,13 +15,13 @@ max_offset = 1.0
 
 print("Test offset Channel 1...")
 BS = bm.BIMMS()
-offset_DC = measures.Measure_Offset(BS = BS,channel = 1)
+offset_DC = bm.Measure_Offset(BS = BS,channel = 1)
 if (np.abs(offset_DC)>max_offset):
 	BS.close()
 	raise ValueError('Excessive offset value in measured on Channel 1')
 
 
-offset_AC = measures.Measure_Offset(BS = BS,channel = 1,coupling = 'AC')
+offset_AC = bm.Measure_Offset(BS = BS,channel = 1,coupling = 'AC')
 if (np.abs(offset_AC)<np.abs(offset_DC)):
 	print("WARNING: DC coupled offset should be lower than AC coupled offset")
 

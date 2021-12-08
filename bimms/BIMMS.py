@@ -15,7 +15,8 @@
 
 """
 import sys
-import andi
+import os
+import andi as ai
 import faulthandler
 import numpy as np
 import os 
@@ -25,7 +26,7 @@ from scipy.signal import savgol_filter,butter, lfilter, freqz
 from   time         import sleep
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-import BIMMS_constants as cst
+import constants as cst
 
 
 ### for debug
@@ -79,12 +80,12 @@ def unwrap_phase(phase):
 class BIMMS(object):
 	def __init__(self):
 		super(BIMMS, self).__init__()
-		self.interface = andi.Andi() 
+		self.interface = ai.Andi() 
 		if verbose:
 			print('device opened')
 		self.SPI_init()
 		self.ID = self.get_board_ID()
-		if (self.ID == 0):
+		if (self.ID == 0 or self.ID > 255):
 			self.close()
 			if verbose:
 				raise ValueError('Failed to communicate with STM32 MCU. Make sure that BIMMS is powered.')
@@ -192,8 +193,6 @@ class BIMMS(object):
 	def Load_DCCal(self):
 		if not os.path.exists(self.cal_folder):
 			if verbose:
-				print("WARNING: Calibration Directory does not exist. Failed to load calibration data.")
-				print("Consider running calibration scripts.")
 				return(0)
 		else:
 			file_name = self.cal_folder + 'DCCal_BIMMS_' + str(self.ID) + '.json'
@@ -202,9 +201,6 @@ class BIMMS(object):
 				self.DCCalFile = json.load(json_file)
 				json_file.close()
 				if (self.DCCalFile['BIMMS_SERIAL'] != self.ID):
-					if verbose:
-						print("WARNING: DC Calibration file ID is not consistent with the connected device.")
-						print("Consider running calibration scripts.")
 					return(0)
 			except:
 				return(0)
@@ -225,9 +221,6 @@ class BIMMS(object):
 
 	def Load_OSLCal(self):
 		if not os.path.exists(self.cal_folder):
-			if verbose:
-				print("WARNING: Calibration Directory does not exist. Failed to load calibration data.")
-				print("Consider running calibration scripts.")
 			return(0)
 		else:
 			file_name = './' + self.cal_folder + '/OSLCal_BIMMS_' + str(self.ID) + '.json'
@@ -235,9 +228,6 @@ class BIMMS(object):
 				json_file = open(file_name) 
 				self.OSLCalFile = json.load(json_file)
 				if (self.OSLCalFile['BIMMS_SERIAL'] != self.ID):
-					if verbose:
-						print("WARNING: Calibration file ID is not consistent with the connected device.")
-						print("Consider running calibration scripts.")
 					return(0)
 			except:
 				return(0)

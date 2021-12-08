@@ -1,8 +1,6 @@
-import BIMMS as bm
+import bimms as bm
 import time
-import BIMMS_constants as cst
 import numpy as np
-import BIMMS_Measures as measures
 import matplotlib.pyplot as plt
 
 print('======== TIA test ========')
@@ -19,7 +17,7 @@ BS.set_config()
 
 max_offset = 1
 print("Test offset TIA ...")
-offset_DC = measures.Measure_Offset(BS = BS,channel = 2)
+offset_DC = bm.Measure_Offset(BS = BS,channel = 2)
 if (np.abs(offset_DC)>max_offset):
 	BS.close()
 	raise ValueError('Excessive offset value on TIA')

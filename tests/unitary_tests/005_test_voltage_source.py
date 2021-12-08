@@ -1,8 +1,6 @@
-import BIMMS as bm
+import bimms as bm
 import time
-import BIMMS_constants as cst
 import numpy as np
-import BIMMS_Measures as measures
 import matplotlib.pyplot as plt
 
 print('======== Voltage source test ========')
@@ -19,22 +17,26 @@ max_offset = 1.0
 
 print("Test offset voltage source ...")
 BS.set_voltage_excitation(coupling = 'DC', differential_stim = False)
-offset_DC = measures.Measure_Offset(BS = BS,channel = 1)
+BS.set_2_points_config()
+offset_DC = bm.Measure_Offset(BS = BS,channel = 1)
 if (np.abs(offset_DC)>max_offset):
 	BS.close()
 	raise ValueError('Excessive offset value in measured on voltage source')
 BS.set_voltage_excitation(coupling = 'AC', differential_stim = False)
-offset_DC = measures.Measure_Offset(BS = BS,channel = 1)
+BS.set_2_points_config()
+offset_DC = bm.Measure_Offset(BS = BS,channel = 1)
 if (np.abs(offset_DC)>max_offset):
 	BS.close()
 	raise ValueError('Excessive offset value in measured on voltage source')
 BS.set_voltage_excitation(coupling = 'DC', differential_stim = True)
-offset_DC = measures.Measure_Offset(BS = BS,channel = 1)
+BS.set_2_points_config()
+offset_DC = bm.Measure_Offset(BS = BS,channel = 1)
 if (np.abs(offset_DC)>max_offset):
 	BS.close()
 	raise ValueError('Excessive offset value in measured on voltage source')
 BS.set_voltage_excitation(coupling = 'AC', differential_stim = True)
-offset_DC = measures.Measure_Offset(BS = BS,channel = 1)
+BS.set_2_points_config()
+offset_DC = bm.Measure_Offset(BS = BS,channel = 1)
 if (np.abs(offset_DC)>max_offset):
 	BS.close()
 	raise ValueError('Excessive offset value in measured on voltage source')
@@ -60,6 +62,7 @@ gain_DIFF = 2.2
 
 BS.set_voltage_excitation(coupling = 'DC', differential_stim = False)
 BS.set_recording_voltage(coupling = 'DC', gain = gain_IA)
+BS.set_2_points_config()
 BS.set_config()
 BS.interface.configure_network_analyser()
 vrange = round(amp  * gain_SE*1.5,2)
@@ -72,6 +75,7 @@ if (error>tolerance):
 
 BS.set_voltage_excitation(coupling = 'DC', differential_stim = True)
 BS.set_recording_voltage(coupling = 'DC', gain = gain_IA)
+BS.set_2_points_config()
 BS.set_config()
 BS.interface.configure_network_analyser()
 vrange = round(amp  * gain_DIFF*1.5,2)

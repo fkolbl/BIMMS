@@ -1,4 +1,4 @@
-import Analysis_Instrument as ai
+import andi as ai
 import time
 
 try:
