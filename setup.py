@@ -1,18 +1,18 @@
 from setuptools import setup
 
 setup(
-   name='andi',
+   name='bimms',
    version='0.0.1',
-   description='Analog Discovery 2 python API',
+   description='BIMMS python API',
    long_description = 'file: README.md',
-   author='Florian Kolbl - Yannick Bornat - Louis Regnacq',
+   author='Louis Regnacq - Florian Kolbl',
    packages=['andi'],  #same as name
    include_package_data = True,
-   url = 'https://github.com/fkolbl/andi',
+   url = 'https://github.com/fkolbl/BIMMS',
    classifiers =[
     'Programming Language :: Python :: 3',
     'Operating System :: OS Independent'
      ],
-    install_requires=['numpy'], #external packages as dependencies
+    install_requires=['numpy','matplotlib','scipy'], #external packages as dependencies
     python_requires = '>=3.6'
 )

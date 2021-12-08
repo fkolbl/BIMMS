@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name BioZ_front_end_v2-rescue)(type Legacy)(uri /Users/louisregnacq/Dropbox/Work/BioZ/ETIS_proto/PCB_Front_END/BioZ_front_end_v2/BioZ_front_end_v2-rescue.lib)(options "")(descr ""))
+  (lib (name BioZ_front_end_V2_1-rescue)(type Legacy)(uri ${KIPRJMOD}/BioZ_front_end_V2_1-rescue.lib)(options "")(descr ""))
+)
