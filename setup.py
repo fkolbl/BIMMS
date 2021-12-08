@@ -14,6 +14,6 @@ setup(
     'Operating System :: OS Independent'
      ],
     #install_requires=['numpy','matplotlib','scipy'], #external packages as dependencies
-    install_requires=['numpy','andi','matplotlib','scipy'], #external packages as dependencies
+    install_requires=['numpy','andi-py','matplotlib','scipy'], #external packages as dependencies
     python_requires = '>=3.6'
 )
