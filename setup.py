@@ -6,7 +6,7 @@ setup(
    description='BIMMS python API',
    long_description = 'file: README.md',
    author='Louis Regnacq - Florian Kolbl',
-   packages=['andi'],  #same as name
+   packages=['bimms'],  #same as name
    include_package_data = True,
    url = 'https://github.com/fkolbl/BIMMS',
    classifiers =[
@@ -14,5 +14,6 @@ setup(
     'Operating System :: OS Independent'
      ],
     install_requires=['numpy','matplotlib','scipy'], #external packages as dependencies
+    #install_requires=['numpy,'andi','matplotlib','scipy'], #external packages as dependencies
     python_requires = '>=3.6'
 )
