@@ -14,7 +14,7 @@ import bimms as bm
 import numpy as np
 import matplotlib.pyplot as plt
 
-fmin = 100            #Start Frequency (Hz)
+fmin = 1000            #Start Frequency (Hz)
 fmax = 10e6            #Stop Frequency (Hz)
 n_pts = 200           #Number of frequency points
 amp = 0.1              #amplitude (V)
