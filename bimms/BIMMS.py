@@ -903,26 +903,26 @@ class BIMMS(object):
 		else: 
 			self.set_TIA_DC_coupling()
 
-	def set_potentiostat_EIS_config(self,differential = True, two_wires = True, coupling = 'DC'):
+	def set_potentiostat_EIS_config(self,differential = True, two_wires = True, coupling = 'DC',voltage_gain=1,current_gain = 1):
 		self.set_STM32_idle()
 		if (differential):
 			if (coupling == 'DC'):
 				self.set_voltage_excitation(coupling = 'DC', differential_stim = True)
-				self.set_recording_current(differential = True, coupling = 'DC', gain = 1)		#IA Gain not used for now
-				self.set_recording_voltage(coupling = 'DC', gain = 1)							#IA Gain not used for now
+				self.set_recording_current(differential = True, coupling = 'DC', gain = current_gain)		
+				self.set_recording_voltage(coupling = 'DC', gain = voltage_gain)							
 			else :
 				self.set_voltage_excitation(coupling = 'AC', differential_stim = True)		
-				self.set_recording_current(differential = True, coupling = 'DC', gain = 1)		#IA Gain not used for now
-				self.set_recording_voltage(coupling = 'AC', gain = 1)							#IA Gain not used for now
+				self.set_recording_current(differential = True, coupling = 'DC', gain = current_gain)		
+				self.set_recording_voltage(coupling = 'AC', gain = voltage_gain)							
 		else :
 			if (coupling == 'DC'):
 				self.set_voltage_excitation(coupling = 'DC', differential_stim = False)
-				self.set_recording_current(differential = False, coupling = 'DC', gain = 1)		#IA Gain not used for now
-				self.set_recording_voltage(coupling = 'DC', gain = 1)							#IA Gain not used for now
+				self.set_recording_current(differential = False, coupling = 'DC', gain = current_gain)		
+				self.set_recording_voltage(coupling = 'DC', gain = voltage_gain)							
 			else :
 				self.set_voltage_excitation(coupling = 'AC', differential_stim = False)
-				self.set_recording_current(differential = False, coupling = 'DC', gain = 1)		#IA Gain not used for now
-				self.set_recording_voltage(coupling = 'AC', gain = 1)							#IA Gain not used for now
+				self.set_recording_current(differential = False, coupling = 'DC', gain = current_gain)		
+				self.set_recording_voltage(coupling = 'AC', gain = voltage_gain)							
 		if (two_wires):
 			self.set_2_points_config()
 		else :
@@ -930,26 +930,26 @@ class BIMMS(object):
 		self.set_config()
 
 
-	def set_galvanostat_EIS_config(self,differential = True, two_wires = True,High_gain = True, coupling = 'DC', DC_feedback = False):
+	def set_galvanostat_EIS_config(self,differential = True, two_wires = True,High_gain = True, coupling = 'DC', DC_feedback = False,voltage_gain=1,current_gain = 1):
 		self.set_STM32_idle()
 		if (differential):
 			if (coupling == 'DC'):
 				self.set_current_excitation(coupling = 'DC', differential_stim = True, DC_feedback = DC_feedback, Internal_AWG = True, High_gain = High_gain)
-				self.set_recording_current(differential = True, coupling = 'DC', gain = 1)		#IA Gain not used for now
-				self.set_recording_voltage(coupling = 'DC', gain = 1)							#IA Gain not used for now
+				self.set_recording_current(differential = True, coupling = 'DC', gain = current_gain)		
+				self.set_recording_voltage(coupling = 'DC', gain = voltage_gain)							
 			else :
 				self.set_current_excitation(coupling = 'AC', differential_stim = True, DC_feedback = DC_feedback, Internal_AWG = True, High_gain = High_gain)	
-				self.set_recording_current(differential = True, coupling = 'DC', gain = 1)		#IA Gain not used for now
-				self.set_recording_voltage(coupling = 'AC', gain = 1)							#IA Gain not used for now
+				self.set_recording_current(differential = True, coupling = 'DC', gain = current_gain)		
+				self.set_recording_voltage(coupling = 'DC', gain = voltage_gain)							
 		else :
 			if (coupling == 'DC'):
 				self.set_current_excitation(coupling = 'DC', differential_stim = False, DC_feedback = DC_feedback, Internal_AWG = True, High_gain = High_gain)
-				self.set_recording_current(differential = False, coupling = 'DC', gain = 1)		#IA Gain not used for now
-				self.set_recording_voltage(coupling = 'DC', gain = 1)							#IA Gain not used for now
+				self.set_recording_current(differential = False, coupling = 'DC', gain = current_gain)		
+				self.set_recording_voltage(coupling = 'DC', gain = voltage_gain)							
 			else :
 				self.set_current_excitation(coupling = 'AC', differential_stim = False, DC_feedback = DC_feedback, Internal_AWG = True, High_gain = High_gain)
-				self.set_recording_current(differential = False, coupling = 'DC', gain = 1)		#IA Gain not used for now
-				self.set_recording_voltage(coupling = 'AC', gain = 1)							#IA Gain not used for now
+				self.set_recording_current(differential = False, coupling = 'DC', gain = current_gain)		
+				self.set_recording_voltage(coupling = 'DC', gain = voltage_gain)							
 		if (two_wires):
 			self.set_2_points_config()
 		else :
@@ -962,12 +962,12 @@ class BIMMS(object):
 		if (mode == 'two_points'):
 			if (coupling == 'DC'):
 				self.set_voltage_excitation(coupling = 'DC', differential_stim = differential)
-				self.set_recording_current(differential = differential, coupling = 'DC', gain = 1)		#IA Gain not used for now
-				self.set_recording_voltage(coupling = 'DC', gain = 1)									#IA Gain not used for now
+				self.set_recording_current(differential = differential, coupling = 'DC', gain = 1)		
+				self.set_recording_voltage(coupling = 'DC', gain = 1)									
 			else :
 				self.set_voltage_excitation(coupling = 'AC', differential_stim = differential)		
-				self.set_recording_current(differential = differential, coupling = 'DC', gain = 1)		#IA Gain not used for now
-				self.set_recording_voltage(coupling = 'AC', gain = 1)									#IA Gain not used for now
+				self.set_recording_current(differential = differential, coupling = 'DC', gain = 1)		
+				self.set_recording_voltage(coupling = 'AC', gain = 1)									
 			self.set_2_points_config()
 
 		self.set_config()
@@ -978,12 +978,12 @@ class BIMMS(object):
 		if (mode == 'two_points'):
 			if (coupling == 'DC'):
 				self.set_current_excitation(coupling = 'DC', differential_stim = True, DC_feedback = DC_feedback, Internal_AWG = True, High_gain = High_gain)
-				self.set_recording_current(differential = differential, coupling = 'DC', gain = 1)		#IA Gain not used for now
-				self.set_recording_voltage(coupling = 'DC', gain = 1)									#IA Gain not used for now
+				self.set_recording_current(differential = differential, coupling = 'DC', gain = 1)		
+				self.set_recording_voltage(coupling = 'DC', gain = 1)									
 			else :
 				self.set_current_excitation(coupling = 'DC', differential_stim = True, DC_feedback = DC_feedback, Internal_AWG = True, High_gain = High_gain)
-				self.set_recording_current(differential = differential, coupling = 'DC', gain = 1)		#IA Gain not used for now
-				self.set_recording_voltage(coupling = 'AC', gain = 1)									#IA Gain not used for now
+				self.set_recording_current(differential = differential, coupling = 'DC', gain = 1)		
+				self.set_recording_voltage(coupling = 'AC', gain = 1)									
 			self.set_2_points_config()
 		self.set_config()
 
@@ -1097,10 +1097,11 @@ class BIMMS(object):
 		return freq, gain_mes, phase_mes
 
 
-	def galvanostat_EIS(self,fmin = 1e2, fmax = 1e7, n_pts = 501, I_amp = 1, I_offset = 0, settling_time = 0.1, NPeriods = 32,
+	def galvanostat_EIS(self,fmin = 1e2, fmax = 1e7, n_pts = 501, I_amp = 1, I_offset = 0, settling_time = 0.1, NPeriods = 32,voltage_gain=1,current_gain = 1,
 								V_range = 1.0, V_offset = 0.0, differential = True,High_gain = True, two_wires = True, coupling = 'DC', DC_feedback = False, apply_cal = True):
 		
-		self.set_galvanostat_EIS_config(differential=differential, two_wires = two_wires,High_gain = High_gain, coupling = coupling,DC_feedback = DC_feedback)
+		self.set_galvanostat_EIS_config(differential=differential, two_wires = two_wires,High_gain = High_gain, coupling = coupling,DC_feedback = DC_feedback,
+										voltage_gain=voltage_gain,current_gain=current_gain)
 
 		if (High_gain):
 			amp = I_amp/self.Gain_High_current
@@ -1128,10 +1129,10 @@ class BIMMS(object):
 
 
 
-	def potentiostat_EIS(self, fmin = 1e2, fmax = 1e7, n_pts = 501, V_amp = 1, V_offset = 0, settling_time = 0.1, NPeriods = 32,
+	def potentiostat_EIS(self, fmin = 1e2, fmax = 1e7, n_pts = 501, V_amp = 1, V_offset = 0, settling_time = 0.1, NPeriods = 32,voltage_gain=1,current_gain = 1,
 						differential = True, two_wires = True, coupling = 'DC', apply_cal = True):
 
-		self.set_potentiostat_EIS_config(differential=differential, two_wires = two_wires, coupling = coupling)
+		self.set_potentiostat_EIS_config(differential=differential, two_wires = two_wires, coupling = coupling,voltage_gain=voltage_gain,current_gain=current_gain)
 			
 		if (differential):
 			amp = V_amp/self.Gain_Voltage_DIFF
