@@ -1,8 +1,6 @@
 # BIMMS
 *Python librairy for controling BIMMS*
 
-blablabla
-this is a test
 
 # Installation
 
