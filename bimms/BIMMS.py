@@ -85,7 +85,7 @@ class BIMMS(object):
             print('device opened')
         self.SPI_init()
         self.ID = self.get_board_ID()
-        if (self.ID == 0 or self.ID > 255):
+        if (self.ID == 0 or self.ID > 16):      #only 8 bimms for now
             self.close()
             if verbose:
                 raise ValueError('Failed to communicate with STM32 MCU. Make sure that BIMMS is powered (try to reconnect USB).')
