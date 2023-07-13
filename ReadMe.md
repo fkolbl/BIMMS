@@ -1,5 +1,5 @@
 # BIMMS
-*Python librairy for controling BIMMS [BIMMS](https://www.hardware-x.com/article/S2468-0672(22)00132-8/fulltext)*
+*Python librairy for controling [BIMMS](https://www.hardware-x.com/article/S2468-0672(22)00132-8/fulltext)*
 
 
 # Installation
@@ -21,4 +21,4 @@ Required packages:
 
 
 for the third party softwares, please visit:
-[Waveform]: https://digilent.com/shop/software/digilent-waveforms/
+[Waveform](https://digilent.com/shop/software/digilent-waveforms/)
