@@ -1,5 +1,5 @@
 # BIMMS
-*Python librairy for controling BIMMS* \url{https://www.hardware-x.com/article/S2468-0672(22)00132-8/fulltext}
+*Python librairy for controling BIMMS* [link](https://www.hardware-x.com/article/S2468-0672(22)00132-8/fulltext)
 
 
 # Installation
