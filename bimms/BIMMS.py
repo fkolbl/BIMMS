@@ -22,7 +22,7 @@ import numpy as np
 import os 
 import json
 import matplotlib.pyplot as plt
-from scipy.signal import savgol_filter,butter, lfilter, freqz
+from scipy.signal import savgol_filter, butter, lfilter, freqz
 from   time         import sleep
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
@@ -78,20 +78,50 @@ def unwrap_phase(phase):
 ## CLASS FOR BIMMS HANDLING ##
 ##############################
 class BIMMS(object):
-    def __init__(self):
+    def __init__(self, bimms_id=None, serialnumber=None):
         super(BIMMS, self).__init__()
-        self.interface = ai.Andi()
+
+        # To maintain connection use keep_on
+        self.switch_off = True
+        self.selected = False
+        self.interface_on = False
+
+        if isinstance(bimms_id, int): 
+            if bimms_id in cst.BimmsSerialNumbers:
+                self.serialnumber = cst.BimmsSerialNumbers[bimms_id]
+                self.selected = True
+            else:
+                print("warning 'bimms_id' not referentced: first device will be selected")
+                exit()
+        elif isinstance(serialnumber,str):
+            if serialnumber in cst.BimmsSerialNumbers.values():
+                self.serialnumber
+                self.selected = True
+            else:
+                print("warning 'serialnumber' not referentced: first device will be selected")
+                exit()
+
+        if self.selected:
+            self.interface = ai.Andi(self.serialnumber)
+        else:
+            self.interface = ai.Andi()
+            self.serialnumber = self.interface.serialnumber
+        self.interface_on = True
         if verbose:
             print('device opened')
+        self.ID=0
         self.SPI_init()
         self.ID = self.get_board_ID()
+
         if (self.ID == 0 or self.ID > 16):      #only 8 bimms for now
             self.close()
             if verbose:
                 raise ValueError('Failed to communicate with STM32 MCU. Make sure that BIMMS is powered (try to reconnect USB).')
             quit()
+    
         if verbose:
             print('You are connected to BIMMS '+str(self.ID))
+
 
         # default values for gains of all channels
         self.CalFile = ''
@@ -100,7 +130,6 @@ class BIMMS(object):
         self.Gain_Voltage_DIFF = 2.2
         self.Gain_High_current = 1/5000
         self.Gain_Low_current = 1/50000
-
 
         # Relay states
         self.Ch1Coupling = 0 
@@ -182,15 +211,23 @@ class BIMMS(object):
                 print("Estimated impedance will be innacurate.")
                 print("Consider running Open-Short-Load calibration script.")
             self.OSLCalibration = False 
-
+    
     def __del__(self):
-        self.close()
+        if self.switch_off and self.interface_on:
+            self.close()
 
     def close(self):
         self.set_state(cst.STM32_stopped)
         self.interface.close()
+        self.interface_on = False
         if verbose:
             print('device closed')
+    
+    def keep_on(self):
+        self.switch_off = False
+    
+    def keep_off(self):
+        self.switch_off = True
 
     def Load_DCCal(self):
         if not os.path.exists(self.cal_folder):
@@ -1291,3 +1328,6 @@ class BIMMS(object):
 
     def AW_Galvanostat(self,something):
         pass
+
+
+
