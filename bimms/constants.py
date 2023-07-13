@@ -75,3 +75,16 @@ ID_add = 0
 state_add = 1
 error_add = 2
 relays_map_add = 3
+
+## BIMMS Board/serial-numbers dictionary
+
+BimmsSerialNumbers = {1: '',\
+                    2: '',\
+                    3: 'SN:210321B2825B',\
+                    4: 'SN:210321B28C03',\
+                    5: 'SN:210321B281BF',\
+                    6: 'SN:210321B28CCD',\
+                    7: '',\
+                    8: 'SN:210321B2825D',\
+                    9: 'SN:210321B28CEB'}
+
