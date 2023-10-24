@@ -16,11 +16,19 @@ set_STM32_state = 0x01
 set_relay = 0x02
 read_register = 0x03
 
-## STM STATE
+## STM32 STATE
 STM32_stopped = 0x00
 STM32_idle = 0x01
 STM32_locked = 0x02
 STM32_error = 0x03
+
+## STM32 to AD2 SPI
+STM32_CLK = 1e6
+STM32_CLK_p = 1
+STM32_MOSI_p = 2
+STM32_MISO_p = 3
+STM32_CS_p = 0
+
 
 ## IA Gain IOs
 CH1_A0_0 = 2**8

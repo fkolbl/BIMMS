@@ -110,8 +110,13 @@ class BIMMS(object):
         if verbose:
             print('device opened')
         self.ID=0
+
         self.SPI_init()
+
         self.ID = self.get_board_ID()
+
+            
+
 
         if (self.ID == 0 or self.ID > 16):      #only 8 bimms for now
             self.close()
@@ -556,29 +561,29 @@ class BIMMS(object):
     #################################
     def SPI_init(self):
         self.interface.SPI_reset()
-        self.interface.set_SPI_frequency(1e6)
-        self.interface.set_SPI_Clock_channel(1)
-        self.interface.set_SPI_Data_channel(ai.SPIDataIdx['DQ0_MOSI_SISO'],2)
-        self.interface.set_SPI_Data_channel(ai.SPIDataIdx['DQ1_MISO'],3)
+        self.interface.set_SPI_frequency(cst.STM32_CLK)
+        self.interface.set_SPI_Clock_channel(cst.STM32_CLK_p)
+        self.interface.set_SPI_Data_channel(ai.SPIDataIdx['DQ0_MOSI_SISO'],cst.STM32_MOSI_p)
+        self.interface.set_SPI_Data_channel(ai.SPIDataIdx['DQ1_MISO'],cst.STM32_MISO_p)
         self.interface.set_SPI_mode(ai.SPIMode['CPOL_1_CPA_1'])
         self.interface.set_SPI_MSB_first()
-        self.interface.set_SPI_CS(0,ai.LogicLevel['H'])
+        self.interface.set_SPI_CS(cst.STM32_CS_p,ai.LogicLevel['H'])
 
     def tx_2_STM32(self,value):
         tx_8bvalues = convert(value)
-        self.interface.set_SPI_CS(0,ai.LogicLevel['L'])		
+        self.interface.SPI_select(cst.STM32_CS_p,ai.LogicLevel['L'])		
         for k in tx_8bvalues:
             self.interface.SPI_write_one(ai.SPI_cDQ['MOSI/MISO'],8,k)
-        self.interface.set_SPI_CS(0,ai.LogicLevel['H'])
+        self.interface.SPI_select(cst.STM32_CS_p,ai.LogicLevel['H'])
 
     def rx_from_STM32(self):
         offsets = [2**24, 2**16, 2**8, 2**0]
         value = 0
-        self.interface.set_SPI_CS(0,ai.LogicLevel['L'])
+        self.interface.SPI_select(cst.STM32_CS_p,ai.LogicLevel['L'])
         for k in offsets:
             rx = self.interface.SPI_read_one(ai.SPI_cDQ['MOSI/MISO'],8)
             value += rx*k
-        self.interface.set_SPI_CS(0,ai.LogicLevel['H'])
+        self.interface.SPI_select(cst.STM32_CS_p,ai.LogicLevel['H'])
         return value
 
     def read_STM32_register(self, address):
