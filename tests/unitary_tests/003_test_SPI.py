@@ -1,11 +1,9 @@
 import andi as ai
 import bimms as bm
 import time
-import constants as cst
-
+from bimms import cst
 
 interface = ai.Andi()
-
 ## STM32 to AD2 SPI
 STM32_CLK = 1e6
 STM32_CLK_p = 1

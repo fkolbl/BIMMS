@@ -1,6 +1,6 @@
 """
 	Python library to use BIMMS measurement setup - STM32 constants
-	Authors: Florian Kolbl / Louis Regnacq
+	Authors: Florian Kolbl / Louis Regnacq / Thomas Couppey
 	(c) ETIS - University Cergy-Pontoise
 		IMS - University of Bordeaux
 		CNRS

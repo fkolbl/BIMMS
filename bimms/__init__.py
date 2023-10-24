@@ -5,12 +5,13 @@ __title__           = 'BIMMS'
 __version__         = '0.0.1'
 __date__            = '2021–07–12'
 __author__          = 'Louis Regnacq'
-__contributors__    = 'Louis Regnacq, Florian Kolbl, Yannick Bornat'
+__contributors__    = 'Louis Regnacq, Florian Kolbl, Yannick Bornat, Thomas Couppey'
 __copyright__       = 'Louis Regnacq'
 __license__         = 'CeCILL'
 
 # Public interface
-from .BIMMS import *
-from .PostProcessing import *
-from .Measures import *
-from . import constants as cst
+from .system.BIMMS import *
+from .utils.PostProcessing import *
+from .measure.Measures import *
+from .utils import constants as cst
+from .utils.functions import *
