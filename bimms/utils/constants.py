@@ -8,6 +8,7 @@
 	Requires:
 		Python 3.6 or higher
 """
+import numpy as np
 
 cmd_shift = 2**29
 ## Comannd values
@@ -39,7 +40,7 @@ CH1_A1_1 = 2**11
 CH2_A0_0 = 2**12
 CH2_A1_0 = 2**13
 CH2_A0_1 = 2**14
-CH2_A1_1 = 2**15	
+CH2_A1_1 = 2**15
 
 ## LEDs IO
 LED_err = 2**5
@@ -47,9 +48,7 @@ LED_status = 2**4
 
 ## Free IOs
 IO6 = 2**6
-IO7 = 2**7 
-
-
+IO7 = 2**7
 
 ## Relay mapping
 Ch1Coupling_rly = 2**0
@@ -81,6 +80,12 @@ ID_add = 0
 state_add = 1
 error_add = 2
 relays_map_add = 3
+
+## Gains
+gain_array = np.array([1, 2, 4, 5, 10, 20, 25, 50, 100])
+gain_IA1 = np.array([1, 2, 2, 5, 5, 10, 5, 10, 10])
+gain_IA2 = np.array([1, 1, 2, 1, 2, 2, 5, 5, 10])
+
 
 ## BIMMS Board/serial-numbers dictionary
 

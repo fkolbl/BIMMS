@@ -4,11 +4,23 @@ import traceback
 import subprocess
 import re
 import shutil
+import argparse
 
-unit_test_folder = './unitary_tests/'
-all_tests = sorted(os.listdir(unit_test_folder), reverse=True)
-all_tests.reverse()
-unit_test_results = './unitary_tests/figures/'
+## ARGUMENT PARSER ##
+parser = argparse.ArgumentParser(description="NeuRon Virtualizer automated test module")
+parser.add_argument("-H", "--Hardware", action="store_true", dest="H_TEST",help="")
+
+args = parser.parse_args()
+if args.H_TEST:
+    unit_test_folder = './unitary_tests_hardware/'
+    all_tests = sorted(os.listdir(unit_test_folder), reverse=True)
+    all_tests.reverse()
+    unit_test_results = './unitary_tests/figures/'
+else:
+    unit_test_folder = './unitary_tests_software/'
+    all_tests = sorted(os.listdir(unit_test_folder), reverse=True)
+    all_tests.reverse()
+    unit_test_results = './unitary_tests/figures/'
 
 ###################################
 ## clean the test/figures folder ##

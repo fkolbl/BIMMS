@@ -11,6 +11,7 @@ __license__         = 'CeCILL'
 
 # Public interface
 from .system.BIMMS import *
+from .system.BIMMSconfig import *
 from .utils.PostProcessing import *
 from .measure.Measures import *
 from .utils import constants as cst

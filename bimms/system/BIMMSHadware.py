@@ -38,7 +38,7 @@ verbose = True
 ##############################
 ## CLASS FOR BIMMS HANDLING ##
 ##############################
-class BIMMSHardware(object):
+class BIMMShardware(object):
     @abstractmethod
     def __init__(self, bimms_id=None, serialnumber=None):
         # default values for gains of all channels
@@ -97,6 +97,90 @@ class BIMMSHardware(object):
         self.OSLCalibration = False
         self.cal_folder = "./CalibrationData/"
         self.OSL_cal_data = 0
+
+        # To maintain connection use keep_on
+        self.switch_off = True
+        self.interface_on = False
+
+        self.__start_interface(bimms_id=bimms_id, serialnumber=serialnumber)
+        self.__DIO_init()
+
+
+    def __del__(self):
+        if self.switch_off and self.interface_on:
+            self.close()
+
+    def close(self):
+        self.set_state(cst.STM32_stopped)
+        self.interface.close()
+        self.interface_on = False
+        if verbose:
+            print("device closed")
+
+    def keep_on(self):
+        self.switch_off = False
+
+    def keep_off(self):
+        self.switch_off = True
+
+    def __start_interface(self, bimms_id, serialnumber):
+        selected = False
+        if isinstance(bimms_id, int):
+            if bimms_id in cst.BimmsSerialNumbers:
+                self.serialnumber = cst.BimmsSerialNumbers[bimms_id]
+                selected = True
+            else:
+                print(
+                    "warning 'bimms_id' not referentced: first device will be selected"
+                )
+                exit()
+        elif isinstance(serialnumber, str):
+            if serialnumber in cst.BimmsSerialNumbers.values():
+                self.serialnumber
+                selected = True
+            else:
+                print(
+                    "warning 'serialnumber' not referentced: first device will be selected"
+                )
+                exit()
+
+        if selected:
+            self.interface = ai.Andi(self.serialnumber)
+        else:
+            self.interface = ai.Andi()
+            self.serialnumber = self.interface.serialnumber
+        self.interface_on = True
+        if verbose:
+            print("device opened")
+        self.ID = 0
+
+        self.SPI_init_STM32()
+
+        self.ID = self.get_board_ID()
+
+        if self.ID == 0 or self.ID > 16:  # only 8 bimms for now
+            self.close()
+            if verbose:
+                raise ValueError(
+                    "Failed to communicate with STM32 MCU. Make sure that BIMMS is powered (try to reconnect USB)."
+                )
+            quit()
+
+        if verbose:
+            print("You are connected to BIMMS " + str(self.ID))
+
+
+    def __del__(self):
+        if self.switch_off and self.interface_on:
+            self.close()
+
+
+    def keep_on(self):
+        self.switch_off = False
+
+    def keep_off(self):
+        self.switch_off = True
+
 
     #################################
     ## SPI communitation methods ##
@@ -361,3 +445,173 @@ class BIMMSHardware(object):
 
     def set_Stim_AC_coupling(self):
         self.StimCoupling = 0
+
+    ##############################################
+    ## AD2 Digital IO methods for gains control ##
+    ##############################################
+    def __DIO_init(self):
+        self.interface.configure_digitalIO()
+        self.set_DIO_mode()
+
+    def set_DIO_mode(self):
+        IO_vector = 0
+        IO_vector += self.IO6_IO * cst.IO6
+
+        # IO_vector += self.IO7_IO * cst.IO7
+        # LEDs and IA gain IOs are always set as outputs
+        IO_vector += cst.LED_status
+        IO_vector += cst.LED_err
+        IO_vector += cst.CH1_A0_0
+        IO_vector += cst.CH1_A1_0
+        IO_vector += cst.CH1_A0_1
+        IO_vector += cst.CH1_A1_1
+        IO_vector += cst.CH2_A0_0
+        IO_vector += cst.CH2_A1_0
+        IO_vector += cst.CH2_A0_1
+        IO_vector += cst.CH2_A1_1
+        self.interface.digitalIO_set_as_output(IO_vector)
+
+    def set_DIO_output(self):
+        OUTPUT_vector = 0
+        OUTPUT_vector += self.IO6_value * cst.IO6
+        OUTPUT_vector += self.IO7_value * cst.IO7
+        # LEDs and IA gain IOs are always set as outputs
+        OUTPUT_vector += self.LED_status * cst.LED_status
+        OUTPUT_vector += self.LED_err * cst.LED_err
+        OUTPUT_vector += self.CH1_A0_0 * cst.CH1_A0_0
+        OUTPUT_vector += self.CH1_A1_0 * cst.CH1_A1_0
+        OUTPUT_vector += self.CH1_A0_1 * cst.CH1_A0_1
+        OUTPUT_vector += self.CH1_A1_1 * cst.CH1_A1_1
+        OUTPUT_vector += self.CH2_A0_0 * cst.CH2_A0_0
+        OUTPUT_vector += self.CH2_A1_0 * cst.CH2_A1_0
+        OUTPUT_vector += self.CH2_A0_1 * cst.CH2_A0_1
+        OUTPUT_vector += self.CH2_A1_1 * cst.CH2_A1_1
+
+        self.interface.digitalIO_output(OUTPUT_vector)
+
+    def set_gain_ch1_1(self, value):
+        if (
+            (value != 1) and (value != 2) and (value != 5) and (value != 10)
+        ):  # Invalid gain value
+            self.CH1_A0_0 = 0  # Gain is one
+            self.CH1_A1_0 = 0
+        if value == 1:
+            self.CH1_A0_0 = 0
+            self.CH1_A1_0 = 0
+        if value == 2:
+            self.CH1_A0_0 = 1
+            self.CH1_A1_0 = 0
+        if value == 5:
+            self.CH1_A0_0 = 0
+            self.CH1_A1_0 = 1
+        if value == 10:
+            self.CH1_A0_0 = 1
+            self.CH1_A1_0 = 1
+        self.set_DIO_output()
+
+    def set_gain_ch1_2(self, value):
+        if (
+            (value != 1) and (value != 2) and (value != 5) and (value != 10)
+        ):  # Invalid gain value
+            self.CH1_A0_1 = 0
+            self.CH1_A1_1 = 0  # Gain is one
+        if value == 1:
+            self.CH1_A0_1 = 0
+            self.CH1_A1_1 = 0
+        if value == 2:
+            self.CH1_A0_1 = 1
+            self.CH1_A1_1 = 0
+        if value == 5:
+            self.CH1_A0_1 = 0
+            self.CH1_A1_1 = 1
+        if value == 10:
+            self.CH1_A0_1 = 1
+            self.CH1_A1_1 = 1
+        self.set_DIO_output()
+
+    def set_gain_ch2_1(self, value):
+        if (
+            (value != 1) and (value != 2) and (value != 5) and (value != 10)
+        ):  # Invalid gain value
+            self.CH2_A0_0 = 0
+            self.CH2_A1_0 = 0  # Gain is one
+        if value == 1:
+            self.CH2_A0_0 = 0
+            self.CH2_A1_0 = 0
+        if value == 2:
+            self.CH2_A0_0 = 1
+            self.CH2_A1_0 = 0
+        if value == 5:
+            self.CH2_A0_0 = 0
+            self.CH2_A1_0 = 1
+        if value == 10:
+            self.CH2_A0_0 = 1
+            self.CH2_A1_0 = 1
+        self.set_DIO_output()
+
+    def set_gain_ch2_2(self, value):
+        if (
+            (value != 1) and (value != 2) and (value != 5) and (value != 10)
+        ):  # Invalid gain value
+            self.CH2_A0_1 = 0
+            self.CH2_A1_1 = 0  # Gain is one
+        if value == 1:
+            self.CH2_A0_1 = 0
+            self.CH2_A1_1 = 0
+        if value == 2:
+            self.CH2_A0_1 = 1
+            self.CH2_A1_1 = 0
+        if value == 5:
+            self.CH2_A0_1 = 0
+            self.CH2_A1_1 = 1
+        if value == 10:
+            self.CH2_A0_1 = 1
+            self.CH2_A1_1 = 1
+        self.set_DIO_output()
+
+    #################################
+    ## STM32 communitation methods ##
+    #################################
+    def set_state(self, state):
+        """
+        Set the state of STM32
+
+        Parameters
+        ----------
+        state : int
+            either STM32_stopped, STM32_idle, STM32_locked, STM32_error = 0x03
+            defined in BIMMS_constants
+        """
+        value = cst.cmd_shift * cst.set_STM32_state + state
+        self.tx_2_STM32(value)
+
+    def set_STM32_stopped(self):
+        self.set_state(cst.STM32_stopped)
+
+    def set_STM32_idle(self):
+        self.set_state(cst.STM32_idle)
+
+    def set_STM32_locked(self):
+        self.set_state(cst.STM32_locked)
+
+    def set_STM32_error(self):
+        self.set_state(cst.STM32_error)
+
+    def get_state(self):
+        """
+        Get the state of the STM32
+
+        Returns
+        -------
+        state	: int
+            0: STM32_stopped
+            1: STM32_idle
+            2: STM32_locked
+            3: STM32_error
+        """
+        state = self.read_STM32_register(cst.state_add)
+        return state
+
+    def get_STM32_error(self):
+        error = self.read_STM32_register(cst.error_add)
+        return error
