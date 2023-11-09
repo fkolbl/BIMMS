@@ -82,7 +82,7 @@ class BIMMSconfig(BIMMShardware):
         ## Measeremenet
         self.excitation_sources = config_mode("EXTERNAL" ,"INTERNAL", default="INTERNAL")
         self.excitation_mode =  config_mode("G_EIS", "P_EIS", default="P_EIS")
-        self.wire_mode =  config_mode("2", "4", 2, 4,default="2_WIRE")
+        self.wire_mode =  config_mode("2", "4",default="2_WIRE")
         self.signaling_mode = config_mode("S_E", "DIFF", default="S_E")
         self.excitation_coupling = config_mode("AC", "DC", default="DC")
         self.readout_coupling = config_mode("AC", "DC", default="DC")
@@ -120,10 +120,10 @@ class BIMMSconfig(BIMMShardware):
                 self.set_gain_ch2_2(gain_IA2[0])
 
 
-    def set_VRO_gain(self):
+    def set_VRO_gain(self, value):
         pass
 
-    def set_IRO_gain(self):
+    def set_IRO_gain(self, value):
         pass
 
 
@@ -141,7 +141,7 @@ class BIMMSconfig(BIMMShardware):
             self.connect_external_AWG()
 
         if self.excitation_mode == "G_EIS":
-            pass
+            self.connect_Ipos_to_StimPos()
         else:   # P_EIS
             pass
 
@@ -155,19 +155,20 @@ class BIMMSconfig(BIMMShardware):
         else:   # DIFF
             pass
 
-        if self.excitation_coupling == "AC":
-            pass
-        else:   # DC
-            pass
-        if self.readout_coupling == "AC":
-            pass
-        else:   # DC
-            pass
         if self.G_EIS_gain == "LOW":
             pass
         elif self.G_EIS_gain == "HIGH":
             pass
         else:   # AUTO
+            pass
+
+        if self.excitation_coupling == "AC":
+            self.set_Stim_DC_coupling()
+        else:   # DC
+            self.set_Stim_AC_coupling()
+        if self.readout_coupling == "AC":
+            pass
+        else:   # DC
             pass
 
         self.set_gain_IA(channel=2, gain=int(self.IRO_gain))
