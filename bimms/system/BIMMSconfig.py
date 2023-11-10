@@ -103,19 +103,22 @@ class BIMMSconfig(BIMMShardware):
         self.excitation_sources = config_mode("EXTERNAL" ,"INTERNAL", default="INTERNAL")
         self.excitation_mode =  config_mode("G_EIS", "P_EIS", default="P_EIS")
         self.wire_mode =  config_mode("2_WIRE", "4_WIRE", "2", "4",default="2_WIRE")
-        self.signaling_mode = config_mode("SE", "DIFF", default="SE")
+        self.excitation_signaling_mode = config_mode("SE", "DIFF", default="SE")
         self.excitation_coupling = config_mode("AC", "DC", default="DC")
         self.readout_coupling = config_mode("AC", "DC", default="DC")
 
         """ not sure of these two """
         self.recording_mode =  config_mode("I", "V", "BOTH",default="BOTH")
-        self.signalout_mode = config_mode("SE", "DIFF", default="SE")
+        self.recording_signaling_mode = config_mode("SE", "DIFF", "AUTO", default="AUTO")
 
         # gains
         self.G_EIS_gain = config_mode("LOW", "HIGH", "AUTO", default="AUTO")
         self.IRO_gain = config_mode(*cst.gain_array.tolist(), default=1)
         self.VRO_gain = config_mode(*cst.gain_array.tolist(), default=1)
         self.DC_feedback = config_mode(True, False, default=False)
+
+        # Signals
+        self.I_amplitude = config_mode("", "None", default="None")
 
     ##############################################
     ## AD2 Digital IO methods for gains control ##
@@ -152,6 +155,21 @@ class BIMMSconfig(BIMMShardware):
         """
 
         self.set_STM32_idle()
+
+        if "2" in self.wire_mode:
+            self.set_2_wires_mode()
+        else:   # 4
+            self.set_4_wires_mode()
+        self.set_exitation_config()
+        self.set_recording_config()
+
+        # Send the configuration to set the relays
+        self.send_config()
+
+    def set_exitation_config(self):
+        """
+        
+        """
         if self.excitation_sources == "EXTERNAL":
             self.connect_external_AWG()
         else:
@@ -159,13 +177,6 @@ class BIMMSconfig(BIMMShardware):
 
         if self.excitation_mode == "G_EIS":
             self.connect_Ipos_to_StimPos()
-
-            """ not sure if this should be here """
-            """
-            self.connect_CH1_to_scope_1()
-            self.connect_TIA_to_CH2()
-            self.connect_TIA_to_StimNeg()
-            """
             self.disable_potentiostat()
             if self.G_EIS_gain == "LOW":
                 self.set_low_gain_current_source()
@@ -175,22 +186,10 @@ class BIMMSconfig(BIMMShardware):
                 self.set_low_gain_current_source()  ### TO IMPLEMENT
         else:   # P_EIS
             self.set_voltage_excitation()
-
-            """ not sure if this should be here """
-            """
-            self.connect_CH1_to_scope_1()
-            self.connect_TIA_to_CH2()
-            self.connect_TIA_to_StimNeg()
-            """
             # self.disable_current_source()			#need to be tested, bug with AD830?
             self.disable_potentiostat()
 
-        if "2" in self.wire_mode:
-            self.set_2_wires_mode()
-        else:   # 4
-            self.set_4_wires_mode()
-
-        if self.signaling_mode == "DIFF": 
+        if self.excitation_signaling_mode == "DIFF": 
             if self.excitation_mode == "G_EIS":
                 self.connect_Ineg_to_StimNeg()
             else:   # P_EIS
@@ -203,26 +202,28 @@ class BIMMSconfig(BIMMShardware):
         else:   # DC
             self.set_Stim_DC_coupling()
 
+        if self.DC_feedback == "True":
+            self.enable_DC_feedback()
+        else:   # False
+            self.disable_DC_feedback()
 
-        """ or if it should be there """
+
+    def set_recording_config(self):
+        """
+        
+        """
+        if self.recording_signaling_mode == "AUTO":
+            self.recording_signaling_mode(str(self.excitation_signaling_mode))
+
         if self.recording_mode == "I":
-            self.connect_CH1_to_scope_1()
+            self.set_I_recording()
 
         elif self.recording_mode == "V":
-            self.connect_TIA_to_CH2()
-            self.connect_TIA_to_StimNeg()
-            if self.signalout_mode == "DIFF":
-                self.connect_TIA_to_StimNeg()
-            else:   # SE
-                self.connect_TIA_Neg_to_ground()
-        else:
-            self.connect_CH1_to_scope_1()
-            self.connect_TIA_to_CH2()
-            if self.signalout_mode == "DIFF":
-                self.connect_TIA_to_StimNeg()
-            else:   # SE
-                self.connect_TIA_Neg_to_ground()
-        """                          """
+            self.set_V_recording()
+        else: # BOTH
+            self.set_I_recording()
+            self.set_V_recording()
+ 
 
         if self.readout_coupling == "AC":
             self.set_CH1_AC_coupling()
@@ -234,13 +235,44 @@ class BIMMSconfig(BIMMShardware):
         self.set_gain_IA(channel=cst.IRO_channel, gain=int(self.IRO_gain))
         self.set_gain_IA(channel=cst.VRO_channel, gain=int(self.VRO_gain))
 
-        if self.DC_feedback == "True":
-            self.enable_DC_feedback()
-        else:   # False
-            self.disable_DC_feedback()
-        
-        # Send the configuration to set the relays
-        self.send_config()
+    def set_I_recording(self):
+        if self.recording_mode('I'):
+            self.disconnect_CH1_from_scope_1()
+        self.connect_CH2_to_scope_2()
+        self.connect_TIA_to_CH2()
+        self.connect_TIA_to_StimNeg()
+        if self.excitation_mode == "G_EIS":
+            print("something")
+            if self.excitation_signaling_mode == "DIFF":
+                self.connect_TIA_Neg_to_Ineg()
+            else:
+                self.connect_TIA_Neg_to_ground()
+        else:   # P_EIS
+            if self.recording_signaling_mode == "DIFF":
+                self.connect_TIA_Neg_to_Ineg()
+            else:
+                self.connect_TIA_Neg_to_ground()
+
+    def set_V_recording(self):
+        if self.recording_mode('V'):
+            self.disconnect_CH2_from_scope_2()
+            ##self.disconnect_TIA_from_CH2() fix BUG
+            
+        self.connect_CH1_to_scope_1()
+        self.connect_TIA_to_CH2()
+        self.connect_TIA_to_StimNeg()
+        if self.excitation_mode == "G_EIS":
+            print("something")
+            if self.excitation_signaling_mode == "DIFF":
+                self.connect_TIA_Neg_to_Ineg()
+            else:
+                self.connect_TIA_Neg_to_ground()
+        else:   # P_EIS
+            if self.recording_signaling_mode == "DIFF":
+                self.connect_TIA_Neg_to_Ineg()
+            else:
+                self.connect_TIA_Neg_to_ground()
+
 
     #######################################
     ##  excitation source config methods ##
@@ -259,9 +291,9 @@ class BIMMSconfig(BIMMShardware):
         self.DC_feedback(DC_feedback)
 
         if differential_stim:
-            self.signaling_mode("DIFF")
+            self.excitation_signaling_mode("DIFF")
         else:
-            self.signaling_mode("SE")
+            self.excitation_signaling_mode("SE")
 
         if High_gain:
             self.G_EIS_gain("HIGH")
@@ -276,8 +308,8 @@ class BIMMSconfig(BIMMShardware):
     def set_voltage_excitation(
         self, coupling="DC", differential_stim=True, Internal_AWG=True
     ):
-        self.excitation_mode("V_EIS")
-        self.self.excitation_coupling(coupling)
+        self.excitation_mode("P_EIS")
+        self.excitation_coupling(coupling)
         self.DC_feedback(DC_feedback)
 
         if differential_stim:
