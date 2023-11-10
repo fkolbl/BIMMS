@@ -86,6 +86,9 @@ gain_array = np.array([1, 2, 4, 5, 10, 20, 25, 50, 100])
 gain_IA1 = np.array([1, 2, 2, 5, 5, 10, 5, 10, 10])
 gain_IA2 = np.array([1, 1, 2, 1, 2, 2, 5, 5, 10])
 
+## Channels
+VRO_channel = 1
+IRO_channel = 2
 
 ## BIMMS Board/serial-numbers dictionary
 

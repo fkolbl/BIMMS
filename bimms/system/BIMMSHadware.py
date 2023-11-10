@@ -298,17 +298,17 @@ class BIMMShardware(object):
         relays_map = self.read_STM32_register(cst.relays_map_add)
         return relays_map
 
-    def set_config(self):
+    def send_config(self):
         """
-        Set the relay config to the one stored in the current object
+        Send the one stored in the current object to the stm32 to set relay config
         """
         rvector = self.get_config_vector()
         self.set_relays(rvector)
         # error handling to be written here
 
-    #################################
-    ## BIMMS configuration methods ##
-    #################################
+    ###########################################
+    ## BIMMS low-level configuration methods ##
+    ###########################################
 
     def connect_CH1_to_scope_1(self):
         self.Chan1Scope1 = 1
@@ -445,6 +445,29 @@ class BIMMShardware(object):
 
     def set_Stim_AC_coupling(self):
         self.StimCoupling = 0
+
+    def set_2_points_config(self):
+        warn('This method is deprecated.', DeprecationWarning, stacklevel=2)
+        self.set_2_wires_mode()
+
+    def set_3_points_config(self):
+        warn('This method is deprecated.', DeprecationWarning, stacklevel=2)
+        self.set_3_wires_mode()
+
+    def set_4_points_config(self):
+        warn('This method is deprecated.', DeprecationWarning, stacklevel=2)
+        self.set_4_wires_mode()
+
+    def set_2_wires_mode(self):
+        self.StimNeg2VNeg = 1
+        self.StimPos2VPos = 1
+
+    def set_3_wires_mode(self):
+        pass
+
+    def set_4_wires_mode(self):
+        self.StimNeg2VNeg = 0
+        self.StimPos2VPos = 0
 
     ##############################################
     ## AD2 Digital IO methods for gains control ##
