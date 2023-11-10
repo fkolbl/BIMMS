@@ -118,7 +118,7 @@ class BIMMSconfig(BIMMShardware):
         self.DC_feedback = config_mode(True, False, default=False)
 
         # Signals
-        self.I_amplitude = config_mode("", "None", default="None")
+        #self.I_amplitude = config_mode("", "None", default="None")
 
     ##############################################
     ## AD2 Digital IO methods for gains control ##
@@ -165,6 +165,9 @@ class BIMMSconfig(BIMMShardware):
 
         # Send the configuration to set the relays
         self.send_config()
+
+    def reset_config():
+        pass # TO IMPLEMENT
 
     def set_exitation_config(self):
         """
@@ -223,7 +226,6 @@ class BIMMSconfig(BIMMShardware):
         else: # BOTH
             self.set_I_recording()
             self.set_V_recording()
- 
 
         if self.readout_coupling == "AC":
             self.set_CH1_AC_coupling()
@@ -257,22 +259,10 @@ class BIMMSconfig(BIMMShardware):
         if self.recording_mode('V'):
             self.disconnect_CH2_from_scope_2()
             ##self.disconnect_TIA_from_CH2() fix BUG
-            
         self.connect_CH1_to_scope_1()
-        self.connect_TIA_to_CH2()
-        self.connect_TIA_to_StimNeg()
         if self.excitation_mode == "G_EIS":
-            print("something")
-            if self.excitation_signaling_mode == "DIFF":
-                self.connect_TIA_Neg_to_Ineg()
-            else:
-                self.connect_TIA_Neg_to_ground()
-        else:   # P_EIS
             if self.recording_signaling_mode == "DIFF":
-                self.connect_TIA_Neg_to_Ineg()
-            else:
-                self.connect_TIA_Neg_to_ground()
-
+                print("WARNING: Manual connection between V- and GND required (check CH1 jumper)")
 
     #######################################
     ##  excitation source config methods ##

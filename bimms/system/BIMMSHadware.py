@@ -401,7 +401,7 @@ class BIMMShardware(object):
     ):  # BUG !! Normalement = 0 pour disconnect mais 1 ici pour réparer bug Hardware
         self.TIA2Chan2 = 0
 
-    def disconnect_TIA_from_CH2(self):  # Ne marche pas car bug Hardware
+    def disconnect_TIA_from_CH2(self):  # Ne marche pas car BUG Hardware
         self.TIA2Chan2 = 1
 
     def connect_TIA_Neg_to_ground(self):
