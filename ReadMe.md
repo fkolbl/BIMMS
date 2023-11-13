@@ -22,3 +22,6 @@ Required packages:
 
 for the third party softwares, please visit:
 [Waveform](https://digilent.com/shop/software/digilent-waveforms/)
+
+# TODO
+    - Add defaults gains (gain_SE, gain_DIFF, etc) in cst files and add use them in examples/tests/selftests

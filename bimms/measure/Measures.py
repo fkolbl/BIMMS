@@ -2,7 +2,7 @@
 import numpy as np
 
 
-def Measure_Offset(BS,channel = 1, gain_IA = 1, acq_duration = 1, Nsample = 8192,coupling = 'DC', Vrange = 10, Voffset = 0):
+def Measure_Offset(BS,channel = 1, gain_IA = 1, acq_duration = 1, Nsample = 8192,coupling = 'DC', Vrange = 1, Voffset = 0):
 	sampling_freq = Nsample/acq_duration
 	BS.set_STM32_idle()
 	if (channel == 1):

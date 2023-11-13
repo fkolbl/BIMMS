@@ -18,12 +18,8 @@ from abc import ABC, abstractmethod
 import sys
 import os
 import andi as ai
-import numpy as np
 import os
-import json
-import matplotlib.pyplot as plt
-from scipy.signal import savgol_filter, butter, lfilter, freqz
-from time import sleep
+from warnings import warn
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
@@ -162,7 +158,7 @@ class BIMMShardware(object):
             self.close()
             if verbose:
                 raise ValueError(
-                    "Failed to communicate with STM32 MCU. Make sure that BIMMS is powered (try to reconnect USB)."
+                    "Failed to communicate with STM32 MCU. Make sure that BIMMS is powered (try to reconnect Power Jack)."
                 )
             quit()
 

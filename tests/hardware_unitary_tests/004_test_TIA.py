@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 print('======== TIA test ========')
-print('Plug a 1k resistor')
+print('Connect a 1k resistor between STIM+ and STIM-')
 input('- Press a Key when ready')
 
 BS = bm.BIMMS()

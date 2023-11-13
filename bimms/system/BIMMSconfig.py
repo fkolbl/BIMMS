@@ -16,20 +16,14 @@
 """
 import sys
 import os
-import andi as ai
 import faulthandler
 import numpy as np
 import os
-import json
-import matplotlib.pyplot as plt
-from scipy.signal import savgol_filter, butter, lfilter, freqz
-from time import sleep
 from warnings import warn
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
-
-from .BIMMShadware import BIMMShardware
+from .BIMMSHardware import BIMMShardware
 from ..utils import constants as cst
 
 ### for debug
@@ -106,8 +100,6 @@ class BIMMSconfig(BIMMShardware):
         self.excitation_signaling_mode = config_mode("SE", "DIFF", default="SE")
         self.excitation_coupling = config_mode("AC", "DC", default="DC")
         self.readout_coupling = config_mode("AC", "DC", default="DC")
-
-        """ not sure of these two """
         self.recording_mode =  config_mode("I", "V", "BOTH",default="BOTH")
         self.recording_signaling_mode = config_mode("SE", "DIFF", "AUTO", default="AUTO")
 
@@ -149,14 +141,12 @@ class BIMMSconfig(BIMMShardware):
     ################################
     ## BIMMS measurements methods ##
     ################################
-    def set_config(self):
+    def set_config(self,send = True):
         """
         
         """
-
         self.set_STM32_idle()
-
-        if "2" in self.wire_mode:
+        if self.wire_mode == "2" or self.wire_mode == "2_WIRE":
             self.set_2_wires_mode()
         else:   # 4
             self.set_4_wires_mode()
@@ -164,9 +154,11 @@ class BIMMSconfig(BIMMShardware):
         self.set_recording_config()
 
         # Send the configuration to set the relays
-        self.send_config()
+        if (send):
+            self.send_config()
 
     def reset_config():
+        print("WARNING: RESET CONFIG NOT IMPLEMENTED")
         pass # TO IMPLEMENT
 
     def set_exitation_config(self):
@@ -176,7 +168,7 @@ class BIMMSconfig(BIMMShardware):
         if self.excitation_sources == "EXTERNAL":
             self.connect_external_AWG()
         else:
-            self.connect_external_AWG()
+            self.connect_internal_AWG()
 
         if self.excitation_mode == "G_EIS":
             self.connect_Ipos_to_StimPos()
@@ -187,8 +179,9 @@ class BIMMSconfig(BIMMShardware):
                 self.set_high_gain_current_source()
             else:   # AUTO
                 self.set_low_gain_current_source()  ### TO IMPLEMENT
+                print("WARNING: AUTO CURRENT GAIN NOT IMPLEMENTED")
         else:   # P_EIS
-            self.set_voltage_excitation()
+            self.connect_Vpos_to_StimPos()
             # self.disable_current_source()			#need to be tested, bug with AD830?
             self.disable_potentiostat()
 
@@ -205,7 +198,7 @@ class BIMMSconfig(BIMMShardware):
         else:   # DC
             self.set_Stim_DC_coupling()
 
-        if self.DC_feedback == "True":
+        if self.DC_feedback == True:
             self.enable_DC_feedback()
         else:   # False
             self.disable_DC_feedback()
@@ -244,7 +237,7 @@ class BIMMSconfig(BIMMShardware):
         self.connect_TIA_to_CH2()
         self.connect_TIA_to_StimNeg()
         if self.excitation_mode == "G_EIS":
-            print("something")
+            print("I_recording signalling configuration forced.")
             if self.excitation_signaling_mode == "DIFF":
                 self.connect_TIA_Neg_to_Ineg()
             else:
@@ -275,16 +268,14 @@ class BIMMSconfig(BIMMShardware):
         Internal_AWG=True,
         High_gain=False,
     ):
-
+        warn('Deprecated: consider using explicit configuration instead."', DeprecationWarning, stacklevel=2)
         self.excitation_mode("G_EIS")
-        self.self.excitation_coupling(coupling)
+        self.excitation_coupling(coupling)
         self.DC_feedback(DC_feedback)
-
         if differential_stim:
             self.excitation_signaling_mode("DIFF")
         else:
             self.excitation_signaling_mode("SE")
-
         if High_gain:
             self.G_EIS_gain("HIGH")
         else:
@@ -298,42 +289,21 @@ class BIMMSconfig(BIMMShardware):
     def set_voltage_excitation(
         self, coupling="DC", differential_stim=True, Internal_AWG=True
     ):
+        warn('Deprecated: consider using explicit configuration instead."', DeprecationWarning, stacklevel=2)
         self.excitation_mode("P_EIS")
         self.excitation_coupling(coupling)
-        self.DC_feedback(DC_feedback)
-
         if differential_stim:
-            self.connect_Vneg_to_StimNeg()
+            self.excitation_signaling_mode("DIFF")
         else:
-            self.connect_GND_to_StimNeg()
-
+            self.excitation_signaling_mode("SE")
         if Internal_AWG:
-            self.connect_internal_AWG()
+            self.excitation_sources("INTERNAL")
         else:
-            self.connect_external_AWG()
+            self.excitation_sources("EXTERNAL")
 
     ########################################
     ##  recording channels config methods ##
     ########################################
-    """def set_recording_channel_1(self, coupling="DC", gain=1.0):
-        self.connect_CH1_to_scope_1()
-        if coupling == "DC":
-            self.set_CH1_DC_coupling()
-        else:
-            self.set_CH1_AC_coupling()
-
-        self.set_gain_IA(channel=1, gain=gain)
-
-
-    def set_recording_channel_2(self, coupling="DC", gain=1.0):
-        self.connect_CH2_to_scope_2()
-        if coupling == "DC":
-            self.set_CH2_DC_coupling()
-        else:
-            self.set_CH2_AC_coupling()
-
-        self.set_gain_IA(channel=2, gain=gain)"""
-
     def set_recording_voltage(self, coupling="DC", gain=1.0):
         if self.recording_mode == 'V':
             self.recording_mode('BOTH')
@@ -369,7 +339,31 @@ class BIMMSconfig(BIMMShardware):
     ######################################
     ## high-level configuration methods ##
     ######################################
-    def set_potentiostat_EIS_config(
+    def set_recording_channel_1(self, coupling="DC", gain=1.0):
+        """
+                
+        """
+        self.connect_CH1_to_scope_1()
+        if coupling == "DC":
+            self.set_CH1_DC_coupling()
+        else:
+            self.set_CH1_AC_coupling()
+
+        self.set_gain_IA(channel=1, gain=gain)
+
+    def set_recording_channel_2(self, coupling="DC", gain=1.0):
+        """
+                
+        """
+        self.connect_CH2_to_scope_2()
+        if coupling == "DC":
+            self.set_CH2_DC_coupling()
+        else:
+            self.set_CH2_AC_coupling()
+
+        self.set_gain_IA(channel=2, gain=gain)
+
+    def set_potentiostatic_EIS_config(
         self,
         differential=True,
         two_wires=True,
@@ -409,7 +403,7 @@ class BIMMSconfig(BIMMShardware):
             self.wire_mode(4)
 
 
-    def set_galvanostat_EIS_config(
+    def set_galvanostatic_EIS_config(
         self,
         differential=True,
         two_wires=True,
