@@ -25,3 +25,11 @@ for the third party softwares, please visit:
 
 # TODO
     - Add defaults gains (gain_SE, gain_DIFF, etc) in cst files and add use them in examples/tests/selftests
+    - Add selftests capabilities
+    - Add measurement features 
+    - Set G_EIS/P_EIS when voltage/current excitation set
+    - Add calibration routines
+    - Check "vrange" parameter
+    - Double check excitation/readout signaling
+    - check "set_recording_voltage" and "set_recording_current" in BIMMSConfig
+    - BUG: In 004_test_TIA --> BS.recording_mode is changed between measurements?

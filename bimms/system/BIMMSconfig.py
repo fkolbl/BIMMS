@@ -208,6 +208,8 @@ class BIMMSconfig(BIMMShardware):
         """
         
         """
+        print(self.recording_mode)
+        print(self.recording_signaling_mode)
         if self.recording_signaling_mode == "AUTO":
             self.recording_signaling_mode(str(self.excitation_signaling_mode))
 
@@ -231,6 +233,7 @@ class BIMMSconfig(BIMMShardware):
         self.set_gain_IA(channel=cst.VRO_channel, gain=int(self.VRO_gain))
 
     def set_I_recording(self):
+
         if self.recording_mode('I'):
             self.disconnect_CH1_from_scope_1()
         self.connect_CH2_to_scope_2()
@@ -305,18 +308,19 @@ class BIMMSconfig(BIMMShardware):
     ##  recording channels config methods ##
     ########################################
     def set_recording_voltage(self, coupling="DC", gain=1.0):
-        if self.recording_mode == 'V':
+        """        if self.recording_mode == 'V':
             self.recording_mode('BOTH')
         else:
-            self.recording_mode('I')
+            self.recording_mode('I')"""
         self.readout_coupling(coupling)
         self.VRO_gain(gain)
 
     def set_recording_current(self, differential=True, coupling="DC", gain=1.0):
-        if self.recording_mode == 'I':
+        """if self.recording_mode == 'I':
             self.recording_mode('BOTH')
         else:
             self.recording_mode('V')
+        """
         self.readout_coupling(coupling)
         self.VRO_gain(gain)
         # self.connect_TIA_Neg_to_ground()
