@@ -35,3 +35,4 @@ for the third party softwares, please visit:
     - Comments
     - add verbosity mode
     - do "standard configuration" 
+    - add check_saturation

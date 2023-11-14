@@ -39,6 +39,7 @@ class BIMMShardware(BIMMS_class):
     @abstractmethod
     def __init__(self, bimms_id=None, serialnumber=None):
         super().__init__()
+        '''
         # default values for gains of all channels
         self.CalFile = ""
         self.Gain_TIA = 100
@@ -46,6 +47,10 @@ class BIMMShardware(BIMMS_class):
         self.Gain_Voltage_DIFF = 2.2
         self.Gain_High_current = 1 / 5000
         self.Gain_Low_current = 1 / 50000
+        self.OSLCalibration = False
+        self.cal_folder = "./CalibrationData/"
+        self.OSL_cal_data = 0
+        '''
 
         # Relay states
         self.Ch1Coupling = 0
@@ -91,10 +96,6 @@ class BIMMShardware(BIMMS_class):
         self.IO7_IO = 0
         self.IO6_value = 0
         self.IO7_value = 0
-
-        self.OSLCalibration = False
-        self.cal_folder = "./CalibrationData/"
-        self.OSL_cal_data = 0
 
         # To maintain connection use keep_on
         self.switch_off = True
