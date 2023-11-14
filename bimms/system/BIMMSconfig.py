@@ -45,7 +45,6 @@ class config_mode():
     def __call__(self, mode):
         if str(mode).upper() in self.modes:
             self.value = str(mode).upper()
-            print("Mode: " +str(self.value))
         else:
             print("Mode: " +str(self.value))
             print("Warning : mode not found, ", self.value, " mode kept")
@@ -59,7 +58,15 @@ class config_mode():
 
     def __str__(self):
         return self.value
-    
+
+    def __repr__(self):
+        modes_str = "["
+        for mod in self.modes:
+            modes_str += str(mod)
+            modes_str += ", "
+        modes_str = modes_str[:-2] + "]"
+        return "['config_mode' : "+ self.value + " "+ modes_str + "]"
+
     def __int__(self):
         try:
             return int(self.value)
@@ -72,7 +79,7 @@ class config_mode():
 
         Parameters
         ----------
-        verbose : bool
+        verbose : boolexit()
             if true print the modes
 
         Return
