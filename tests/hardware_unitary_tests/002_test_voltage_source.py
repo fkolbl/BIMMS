@@ -6,20 +6,20 @@ print('Unplug any connected wire/load')
 input('- Press a Key when ready')
 
 BS = bm.BIMMS()
-BS.excitation_sources("INTERNAL")
-BS.excitation_mode("P_EIS")
-BS.wire_mode("2_WIRE")
-BS.readout_coupling("DC")
-BS.recording_mode("V")
-BS.recording_signaling_mode("AUTO")
+BS.config.excitation_sources("INTERNAL")
+BS.config.excitation_mode("P_EIS")
+BS.config.wire_mode("2_WIRE")
+BS.config.readout_coupling("DC")
+BS.config.recording_mode("V")
+BS.config.recording_signaling_mode("AUTO")
 
 #MEASURE OFFSET CH1
 gain_IA = 1
 acqu_duration = 1.0
 max_offset = 1.0
 
-BS.excitation_signaling_mode("SE")
-BS.excitation_coupling("DC")
+BS.config.excitation_signaling_mode("SE")
+BS.config.excitation_coupling("DC")
 BS.set_config()
 print("Test offset voltage source ...")
 offset_DC = bm.Measure_Offset(BS = BS,channel = 1,Vrange = 1)
@@ -29,8 +29,8 @@ if (np.abs(offset_DC)>max_offset):
 	raise ValueError('Excessive offset value in measured on voltage source')
 
 
-BS.excitation_signaling_mode("SE")
-BS.excitation_coupling("AC")
+BS.config.excitation_signaling_mode("SE")
+BS.config.excitation_coupling("AC")
 BS.set_config()
 offset_DC = bm.Measure_Offset(BS = BS,channel = 1,Vrange = 1)
 print("Measured AC-SE offset: " +str(np.round(offset_DC,6)) +'V')
@@ -38,8 +38,8 @@ if (np.abs(offset_DC)>max_offset):
 	BS.close()
 	raise ValueError('Excessive offset value in measured on voltage source')
 
-BS.excitation_signaling_mode("DIFF")
-BS.excitation_coupling("DC")
+BS.config.excitation_signaling_mode("DIFF")
+BS.config.excitation_coupling("DC")
 BS.set_config()
 offset_DC = bm.Measure_Offset(BS = BS,channel = 1,Vrange = 1)
 print("Measured DC-DIFF offset: " +str(np.round(offset_DC,6)) +'V')
@@ -48,8 +48,8 @@ if (np.abs(offset_DC)>max_offset):
 	raise ValueError('Excessive offset value in measured on voltage source')
 
 
-BS.excitation_signaling_mode("DIFF")
-BS.excitation_coupling("AC")
+BS.config.excitation_signaling_mode("DIFF")
+BS.config.excitation_coupling("AC")
 BS.set_config()
 offset_DC = bm.Measure_Offset(BS = BS,channel = 1,Vrange = 1)
 print("Measured AC-DIFF offset: " +str(np.round(offset_DC,6)) +'V')
@@ -76,14 +76,14 @@ gain_DIFF = 2.2
 gain_IA = 1
 ####################################################
 
-BS.excitation_sources("INTERNAL")
-BS.excitation_mode("P_EIS")
-BS.wire_mode("2_WIRE")
-BS.readout_coupling("DC")
-BS.recording_mode("V")
-BS.recording_signaling_mode("AUTO")
-BS.excitation_signaling_mode("SE")
-BS.excitation_coupling("DC")
+BS.config.excitation_sources("INTERNAL")
+BS.config.excitation_mode("P_EIS")
+BS.config.wire_mode("2_WIRE")
+BS.config.readout_coupling("DC")
+BS.config.recording_mode("V")
+BS.config.recording_signaling_mode("AUTO")
+BS.config.excitation_signaling_mode("SE")
+BS.config.excitation_coupling("DC")
 BS.set_config()
 
 BS.interface.configure_network_analyser()
@@ -96,7 +96,7 @@ if (error>tolerance):
 	BS.close()
 	raise ValueError('ERROR: Failed to measure expected gain on voltage source')
 
-BS.excitation_signaling_mode("DIFF")
+BS.config.excitation_signaling_mode("DIFF")
 BS.set_config()
 BS.interface.configure_network_analyser()
 vrange = round(amp  * gain_DIFF*1.5,2)

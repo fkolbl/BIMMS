@@ -14,7 +14,7 @@
         - LR: TIA relay modified too
 
 """
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 import sys
 import os
 import andi as ai
@@ -23,6 +23,7 @@ from warnings import warn
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
+from ..backend.BIMMS_Class import BIMMS_class
 from ..utils.functions import convert
 from ..utils import constants as cst
 
@@ -34,9 +35,10 @@ verbose = True
 ##############################
 ## CLASS FOR BIMMS HANDLING ##
 ##############################
-class BIMMShardware(object):
+class BIMMShardware(BIMMS_class):
     @abstractmethod
     def __init__(self, bimms_id=None, serialnumber=None):
+        super().__init__()
         # default values for gains of all channels
         self.CalFile = ""
         self.Gain_TIA = 100

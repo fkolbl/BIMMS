@@ -6,33 +6,33 @@ print('Connect a 1k resistor between STIM+ and STIM-')
 input('- Press a Key when ready')
 
 BS = bm.BIMMS()
-BS.excitation_sources("INTERNAL")
-BS.excitation_mode("P_EIS")
-BS.wire_mode("2_WIRE")
-BS.recording_mode("I")
-BS.excitation_signaling_mode("SE")
-BS.recording_signaling_mode("AUTO")
-BS.excitation_coupling("DC")
-BS.G_EIS_gain = "LOW"
-BS.IRO_gain = 1
-BS.VRO_gain = 1
-BS.DC_feedback = False
+BS.config.excitation_sources("INTERNAL")
+BS.config.excitation_mode("P_EIS")
+BS.config.wire_mode("2_WIRE")
+BS.config.recording_mode("I")
+BS.config.excitation_signaling_mode("SE")
+BS.config.recording_signaling_mode("AUTO")
+BS.config.excitation_coupling("DC")
+BS.config.G_EIS_gain = "LOW"
+BS.config.IRO_gain = 1
+BS.config.VRO_gain = 1
+BS.config.DC_feedback = False
 BS.set_config()
 
 
 print("Test offset TIA ...")
 
 max_offset = 1
-BS.readout_coupling("DC")
-BS.excitation_signaling_mode("SE")
+BS.config.readout_coupling("DC")
+BS.config.excitation_signaling_mode("SE")
 offset_DC = bm.Measure_Offset(BS = BS,channel = 2)
 print("Measured TIA DC-SE offset: " +str(np.round(offset_DC,6)) +'V')
 if (np.abs(offset_DC)>max_offset):
 	BS.close()
 	raise ValueError('Excessive offset value on TIA')
 
-BS.readout_coupling("AC")
-BS.excitation_signaling_mode("SE")
+BS.config.readout_coupling("AC")
+BS.config.excitation_signaling_mode("SE")
 max_offset = 1
 offset_DC = bm.Measure_Offset(BS = BS,channel = 2)
 print("Measured TIA AC-SE offset: " +str(np.round(offset_DC,6)) +'V')
@@ -40,8 +40,8 @@ if (np.abs(offset_DC)>max_offset):
 	BS.close()
 	raise ValueError('Excessive offset value on TIA')
 
-BS.readout_coupling("DC")
-BS.excitation_signaling_mode("DIFF")
+BS.config.readout_coupling("DC")
+BS.config.excitation_signaling_mode("DIFF")
 max_offset = 1
 offset_DC = bm.Measure_Offset(BS = BS,channel = 2)
 print("Measured TIA DC-DIFF offset: " +str(np.round(offset_DC,6)) +'V')
@@ -49,8 +49,8 @@ if (np.abs(offset_DC)>max_offset):
 	BS.close()
 	raise ValueError('Excessive offset value on TIA')
 
-BS.readout_coupling("AC")
-BS.excitation_signaling_mode("DIFF")
+BS.config.readout_coupling("AC")
+BS.config.excitation_signaling_mode("DIFF")
 max_offset = 1
 offset_DC = bm.Measure_Offset(BS = BS,channel = 2)
 print("Measured TIA AC-DIFF offset: " +str(np.round(offset_DC,6)) +'V')
@@ -75,9 +75,9 @@ load = 1000
 tolerance = 10 #tolerance on measured resistor
 gain_TIA = 100
 
-BS.readout_coupling("DC")
-BS.excitation_signaling_mode("SE")
-BS.recording_mode("BOTH")
+BS.config.readout_coupling("DC")
+BS.config.excitation_signaling_mode("SE")
+BS.config.recording_mode("BOTH")
 
 BS.set_config()
 BS.interface.configure_network_analyser()
@@ -90,7 +90,7 @@ if (np.abs(error)>tolerance):
 	BS.close()
 	raise ValueError('Excessive error on measured resistor. Check TIA')
 
-BS.excitation_signaling_mode("DIFF")
+BS.config.excitation_signaling_mode("DIFF")
 BS.set_config()
 BS.interface.configure_network_analyser()
 vrange = round(amp,2)

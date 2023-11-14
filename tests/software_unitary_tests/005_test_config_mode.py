@@ -17,3 +17,4 @@ p = [i for i in range(10)]
 test_cmode2 = bm.config_mode(*p, default=1)
 print(test_cmode1)
 print(test_cmode2)
+
