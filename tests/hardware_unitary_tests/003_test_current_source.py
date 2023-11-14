@@ -13,7 +13,7 @@ BS.config.readout_coupling("DC")
 BS.config.recording_mode("V")
 BS.config.recording_signaling_mode("AUTO")
 
-BS.G_EIS_gain = "LOW"
+BS.config.G_EIS_gain = "LOW"
 BS.config.IRO_gain = 1
 BS.config.VRO_gain = 1
 BS.config.DC_feedback = False
