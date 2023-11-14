@@ -59,25 +59,41 @@ class BIMMSconfig(BIMMShardware):
         self.config.add_mode("VRO_gain", config_mode(*cst.gain_array.tolist(), default=1))
         self.config.add_mode("DC_feedback", config_mode(True, False, default=False))
 
-        """
-        ## Measeremenet
-        self.config.excitation_sources = config_mode("EXTERNAL" ,"INTERNAL", default="INTERNAL")
-        self.config.excitation_mode =  config_mode("G_EIS", "P_EIS", default="P_EIS")
-        self.config.wire_mode =  config_mode("2_WIRE", "4_WIRE", "2", "4",default="2_WIRE")
-        self.config.excitation_signaling_mode = config_mode("SE", "DIFF", default="SE")
-        self.config.excitation_coupling = config_mode("AC", "DC", default="DC")
-        self.config.readout_coupling = config_mode("AC", "DC", default="DC")
-        self.config.recording_mode =  config_mode("I", "V", "BOTH",default="BOTH")
-        self.config.recording_signaling_mode = config_mode("SE", "DIFF", "AUTO", default="AUTO")
-
-        # gains
-        self.config.G_EIS_gain = config_mode("LOW", "HIGH", "AUTO", default="AUTO")
-        self.config.IRO_gain = config_mode(*cst.gain_array.tolist(), default=1)
-        self.config.VRO_gain = config_mode(*cst.gain_array.tolist(), default=1)
-        self.config.DC_feedback = config_mode(True, False, default=False)"""
-
         # Signals
         #self.I_amplitude = config_mode("", "None", default="None")
+
+    ####################
+    ## Save and load  ##
+    ####################
+    def save_config(self, save=False, fname="bimms_config.json", blacklist=[], **kwargs):
+        """
+        Save the bimms the configuration
+
+        Parameters
+        ----------
+        save : bool, optional
+            If True, save the BIMMS object in a json file
+        fname : str, optional
+            Name of the json file
+        **kwargs : dict, optional
+            Additional arguments to be passed to the save method of the BIMMS object
+        """
+        self.config.save(save=save, fname=fname, **kwargs)
+
+    def load(self, data, blacklist={}, **kwargs):
+        """
+        Load the bimms the configuration
+
+        Parameters
+        ----------
+        data : dict
+            Dictionary containing the BIMMS object
+        blacklist : dict, optional
+            Dictionary containing the keys to be excluded from the load
+        **kwargs : dict, optional
+            Additional arguments to be passed to the load method of the BIMMS object
+        """
+        self.config.load(data, blacklist, **kwargs)
 
     ##############################################
     ## AD2 Digital IO methods for gains control ##

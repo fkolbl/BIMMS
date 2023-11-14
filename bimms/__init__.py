@@ -13,7 +13,7 @@ __license__         = 'CeCILL'
 from .system.BIMMS import BIMMS
 from .system.BIMMSconfig import BIMMSconfig
 #from .utils.PostProcessing import *
-from .utils.config_mode import config_mode, config_mode_list
+from .utils.config_mode import config_mode, config_mode_list, config_range
 from .measure.Measures import *
 from .utils import constants as cst
 from .utils.functions import *
