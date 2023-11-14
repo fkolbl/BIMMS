@@ -1,7 +1,5 @@
 import bimms as bm
-import time
 import numpy as np
-import matplotlib.pyplot as plt
 
 print('======== TIA test ========')
 print('Connect a 1k resistor between STIM+ and STIM-')
@@ -78,7 +76,7 @@ tolerance = 10 #tolerance on measured resistor
 gain_TIA = 100
 
 BS.readout_coupling("DC")
-BS.excitation_signaling_mode("AUTO")
+BS.excitation_signaling_mode("SE")
 BS.recording_mode("BOTH")
 
 BS.set_config()
@@ -92,7 +90,6 @@ if (np.abs(error)>tolerance):
 	BS.close()
 	raise ValueError('Excessive error on measured resistor. Check TIA')
 
-BS.recording_mode("BOTH")		#NOTE: should'nt be required; BUG need to be fixed
 BS.excitation_signaling_mode("DIFF")
 BS.set_config()
 BS.interface.configure_network_analyser()

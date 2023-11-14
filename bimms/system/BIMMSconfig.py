@@ -45,7 +45,9 @@ class config_mode():
     def __call__(self, mode):
         if str(mode).upper() in self.modes:
             self.value = str(mode).upper()
+            print("Mode: " +str(self.value))
         else:
+            print("Mode: " +str(self.value))
             print("Warning : mode not found, ", self.value, " mode kept")
             print("Possible modes are :", self.modes)
 
@@ -208,8 +210,7 @@ class BIMMSconfig(BIMMShardware):
         """
         
         """
-        print(self.recording_mode)
-        print(self.recording_signaling_mode)
+
         if self.recording_signaling_mode == "AUTO":
             self.recording_signaling_mode(str(self.excitation_signaling_mode))
 
@@ -234,7 +235,7 @@ class BIMMSconfig(BIMMShardware):
 
     def set_I_recording(self):
 
-        if self.recording_mode('I'):
+        if self.recording_mode == "I":
             self.disconnect_CH1_from_scope_1()
         self.connect_CH2_to_scope_2()
         self.connect_TIA_to_CH2()
@@ -252,7 +253,7 @@ class BIMMSconfig(BIMMShardware):
                 self.connect_TIA_Neg_to_ground()
 
     def set_V_recording(self):
-        if self.recording_mode('V'):
+        if self.recording_mode == "V":
             self.disconnect_CH2_from_scope_2()
             ##self.disconnect_TIA_from_CH2() fix BUG
         self.connect_CH1_to_scope_1()

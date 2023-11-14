@@ -1,7 +1,5 @@
 import bimms as bm
-import time
 import numpy as np
-import matplotlib.pyplot as plt
 
 print('======== Current source test ========')
 print('Connect a 1k resistor between STIM+ and STIM-')

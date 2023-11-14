@@ -1,5 +1,4 @@
 import bimms as bm
-import time
 
 BS = bm.BIMMSconfig()
 BS.wire_mode(2)
