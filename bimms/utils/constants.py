@@ -102,3 +102,7 @@ BimmsSerialNumbers = {1: '',\
                     8: 'SN:210321B2825D',\
                     9: 'SN:210321B28CEB'}
 
+#AD2 constants
+AD2_AWG_ch = 0      #AWG connected to AD2 AWG CH1
+AD2_VRO_ch = 0      #Voltage readout connected to AD2 scope CH1
+AD2_IRO_ch = 1     #Current readout connected to AD2 scope CH2
