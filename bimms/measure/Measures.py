@@ -43,8 +43,6 @@ def EIS(BS,fmin=1e2,fmax=1e7,n_pts=501,offset=0,settling_time=0.1,NPeriods=32,ap
 	Vrange_CH1 = 1
 	Vrange_CH2 = 1
 
-	print(BS.interface.in_channel_range_info(1))
-	exit()
 
 	if 2 * Vrange_CH1 > 5.0:
 		Vrange_CH1 = 50.0
@@ -84,16 +82,14 @@ def EIS(BS,fmin=1e2,fmax=1e7,n_pts=501,offset=0,settling_time=0.1,NPeriods=32,ap
 def SingleFrequency(BS,xxx):
 	pass
 
-import math
 
-
-def TemporalSingleFrequency(BS,Freq,Phase = 0,Symmetry = 50,Nperiod=1,Delay = 0):
+def TemporalSingleFrequency(BS,amp,Freq,Phase = 0,Symmetry = 50,Nperiod=1,Delay = 0):
 
 	GAIN = 1	
-	amp_stim= 0.1								#need to be changed with calibrated or uncalibrated gain
+	amp_stim= amp								#need to be changed with calibrated or uncalibrated gain
 	Gain_TIA = 100								#need to be changed with calibrated or uncalibrated gain
 	amp_AWG =  amp_stim*GAIN 					#need to be changed with calibrated or uncalibrated gain
-	AWG_offset = 0 								#in calibration
+	AWG_offset = 0.02 								#in calibration
 
 	AD2_VRO_range = 5.0							#in calibration
 	AD2_VRO_offset = 0.0
@@ -106,11 +102,11 @@ def TemporalSingleFrequency(BS,Freq,Phase = 0,Symmetry = 50,Nperiod=1,Delay = 0)
 				   		symmetry = Symmetry)
 
     #set acquisition parameters
-	BS.interface.in_set_channel(channel=BIMMScst.AD2_VRO_ch, Vrange=AD2_VRO_range, Voffset=AD2_VRO_offset)							 #to update with AD2config 
-	BS.interface.in_set_channel(channel=BIMMScst.AD2_IRO_ch, Vrange=AD2_IRO_range, Voffset=AD2_IRO_offset)							 #to update with AD2config 
+	#BS.interface.in_set_channel(channel=BIMMScst.AD2_VRO_ch, Vrange=AD2_VRO_range, Voffset=AD2_VRO_offset)							 #to update with AD2config 
+	#BS.interface.in_set_channel(channel=BIMMScst.AD2_IRO_ch, Vrange=AD2_IRO_range, Voffset=AD2_IRO_offset)							 #to update with AD2config 
 
 	#max Fs
-	Fs_max = BS.interface.in_max_sampling_freq_get()
+	Fs_max = BS.interface.in_frequency_info()[-1]
 	Input_Npts_max = BS.interface.in_buffer_size_info()[-1]
 	Npts = Input_Npts_max
 	fs = Freq*Input_Npts_max/Nperiod
@@ -127,6 +123,7 @@ def TemporalSingleFrequency(BS,Freq,Phase = 0,Symmetry = 50,Nperiod=1,Delay = 0)
 
 	BS.interface.out_channel_on(BIMMScst.AD2_AWG_ch)
 	dat0, dat1 = BS.interface.acq()
+	BS.interface.out_channel_off(BIMMScst.AD2_AWG_ch)
 	return(t,dat0,dat1)
 	#pass
 

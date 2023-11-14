@@ -17,7 +17,7 @@ BS.DC_feedback = False
 BS.set_config()
 
 
-t,dat0,dat1 = bm.TemporalSingleFrequency(BS,Freq = 10000,Nperiod=10,Phase = 90)
+t,dat0,dat1 = bm.TemporalSingleFrequency(BS,amp=0.1,Freq = 10000,Nperiod=10,Phase = 90)
 
 plt.figure()
 plt.plot(t,dat0)

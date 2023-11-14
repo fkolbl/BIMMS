@@ -29,7 +29,7 @@ for the third party softwares, please visit:
     - Add measurement methods/class 
     - Set G_EIS/P_EIS when voltage/current excitation magnitude 
     - Add calibration routines 
-    - Check "vrange" parameter
+    - Check "vrange" parameter --> probably useless, to be defined in AD2config()
     - Double check excitation/readout signaling
     - check "set_recording_voltage" and "set_recording_current" in BIMMSConfig
     - Comments

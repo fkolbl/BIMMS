@@ -21,3 +21,4 @@ plt.figure()
 plt.semilogx(freq,mag)
 plt.show()
 
+

@@ -106,3 +106,47 @@ BimmsSerialNumbers = {1: '',\
 AD2_AWG_ch = 0      #AWG connected to AD2 AWG CH1
 AD2_VRO_ch = 0      #Voltage readout connected to AD2 scope CH1
 AD2_IRO_ch = 1     #Current readout connected to AD2 scope CH2
+
+
+#Default Analog Gains
+Vsource_SE_G_default = 1.1                                          #Default Voltage source gain (Single-Ended)
+Vsource_DIFF_G_default = 221                                        #Default Voltage source gain (Differential)
+Isource_LowR_max = 50000                                            #Maximum Rg in Low Gain mode (G current source = 1/Rg)
+Isource_LowR_min = 1000                                             #Minimum Rg in Low Gain mode 
+Isource_LowR_default = (Isource_LowR_max+Isource_LowR_min)/2        #Default Rg value in Low gain mode
+Isource_HighR_max = 94000                                           #Maximum Rg in High Gain mode 
+Isource_HighR_min = 47000                                           #Minimum Rg in High Gain mode 
+Isource_HighR_default = (Isource_HighR_max+Isource_HighR_min)/2     #Default Rg value in High gain mode
+TIA_G_default = 100                                                 #Default TIA gain
+
+#Max/Min excitation current and voltage
+max_current_LowR = 1
+min_current_LowR = 0
+max_current_HighR = 1
+min_current_HighR = 0
+max_voltage_SE = 1
+min_voltage_SE = 0
+max_voltage_DIFF = 1
+min_voltage_DIFF = 0
+
+#Default compensation offsets
+current_LowR_SE_offset_default = 0
+current_LowR_DIFF_offset_default = 0
+current_HighR_SE_offset_default = 0
+current_HighR_DIFF_offset_default = 0
+voltage_SE_offset_default = 0
+voltage_DIFF_offset_default = 0
+
+#Max/min Voltage and Current readout values
+max_current_readout = 1
+min_current_readout = 0
+max_voltage_readout = 1
+min_voltage_readout = 0
+
+#Self-test constants
+max_readout_offset = 1
+
+
+
+
+
