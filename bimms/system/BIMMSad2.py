@@ -177,7 +177,7 @@ class BIMMSad2(BIMMS_class):
 
     def AWG_sine(self,freq, amp ,offset, phase ,symmetry,activate = False):
         self.ad2.sine(channel=cst.AD2_AWG_ch, freq=freq, amp=amp,activate = False,offset = offset, phase = phase,
-				   		symmetry = symmetry)
+                        symmetry = symmetry)
         
     def AWG_enable(self,enable):
         if (enable == True):
