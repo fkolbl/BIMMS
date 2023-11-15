@@ -86,9 +86,9 @@ BS.config.excitation_signaling_mode("SE")
 BS.config.excitation_coupling("DC")
 BS.set_config()
 
-BS.interface.configure_network_analyser()
+BS.ad2.configure_network_analyser()
 vrange = round(amp  * gain_SE*1.5,2)
-freq, gain_mes, phase_mes, gain_ch1 = BS.interface.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
+freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
 mean_gain = np.mean(gain_ch1)
 error = 100*np.abs(mean_gain-gain_SE)/gain_SE
 print("Measured SE GAIN: " +str(np.round(mean_gain,6)) +'V/V')
@@ -98,9 +98,9 @@ if (error>tolerance):
 
 BS.config.excitation_signaling_mode("DIFF")
 BS.set_config()
-BS.interface.configure_network_analyser()
+BS.ad2.configure_network_analyser()
 vrange = round(amp  * gain_DIFF*1.5,2)
-freq, gain_mes, phase_mes, gain_ch1 = BS.interface.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
+freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
 mean_gain = np.mean(gain_ch1)
 error = 100*np.abs(mean_gain-gain_DIFF)/gain_SE
 print("Measured Diff GAIN: " +str(np.round(mean_gain,6)) +'V/V')

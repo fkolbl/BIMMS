@@ -40,7 +40,7 @@ verbose = True
 class BIMMS(BIMMSconfig):
     def __init__(self, bimms_id=None, serialnumber=None):
         super().__init__(bimms_id=bimms_id, serialnumber=serialnumber)
-
+        self.cal_folder = "./CalibrationData/"
         # Try to load DC calibration file
         if self.Load_DCCal():
             self.DCCalibration = True
@@ -375,7 +375,7 @@ class BIMMS(BIMMSconfig):
         else:
             Vrange_CH2 = 5.0
 
-        freq, gain_mes, phase_mes, gain_ch1 = self.interface.bode_measurement(
+        freq, gain_mes, phase_mes, gain_ch1 = self.ad2.bode_measurement(
             fmin,
             fmax,
             n_points=n_pts,
@@ -430,7 +430,7 @@ class BIMMS(BIMMSconfig):
             amp = I_amp / self.Gain_Low_current
             offset = I_offset / self.Gain_Low_current
 
-        self.interface.configure_network_analyser()
+        self.ad2.configure_network_analyser()
         Vrange_CH1 = V_range * 1.5
         offset_CH1 = V_offset * 1.5
         Vrange_CH2 = 1.0
@@ -497,7 +497,7 @@ class BIMMS(BIMMSconfig):
             amp = V_amp / self.Gain_Voltage_SE
             offset = V_offset / self.Gain_Voltage_SE
 
-        self.interface.configure_network_analyser()
+        self.ad2.configure_network_analyser()
         Vrange_CH1 = V_amp * 1.5
         offset_CH1 = V_offset * 1.5
 
@@ -558,28 +558,28 @@ class BIMMS(BIMMSconfig):
             V_awg = V_amp / self.Gain_Voltage_SE
 
         trig_th = 0
-        self.interface.in_set_channel(channel=0, Vrange=vrange1, Voffset=0.0)
-        self.interface.in_set_channel(channel=1, Vrange=vrange2, Voffset=0.0)
-        self.interface.set_Chan_trigger(
+        self.ad2.in_set_channel(channel=0, Vrange=vrange1, Voffset=0.0)
+        self.ad2.in_set_channel(channel=1, Vrange=vrange2, Voffset=0.0)
+        self.ad2.set_Chan_trigger(
             0, trig_th, hysteresis=0.01, type="Rising", position=0, ref="left"
         )  # Improvement: use internal trigger instead
-        self.interface.triangle(channel=0, freq=1 / period, amp=V_awg, offset=0.0)
+        self.ad2.triangle(channel=0, freq=1 / period, amp=V_awg, offset=0.0)
         if n_delay:
             print("Wait for settling...")
             sleep(n_delay * period)
         print("Measuring...")
-        t = self.interface.set_acq(freq=fs, samples=N_pts)
-        voltage, current = self.interface.acq()
+        t = self.ad2.set_acq(freq=fs, samples=N_pts)
+        voltage, current = self.ad2.acq()
         if n_avg > 0:
             current_array = []
             voltage_array = []
             for i in range(n_avg):
                 print("Average: " + str(i + 1))
-                self.interface.set_Chan_trigger(
+                self.ad2.set_Chan_trigger(
                     0, trig_th, hysteresis=0.01, type="Rising", position=0, ref="left"
                 )  # Improvement: use internal trigger instead
-                t = self.interface.set_acq(freq=fs, samples=N_pts)
-                voltage, current = self.interface.acq()
+                t = self.ad2.set_acq(freq=fs, samples=N_pts)
+                voltage, current = self.ad2.acq()
                 voltage_array.append(voltage)
                 current_array.append(current)
             voltage_array = np.array(voltage_array)
@@ -587,11 +587,11 @@ class BIMMS(BIMMSconfig):
             voltage = np.mean(voltage_array, axis=0)
             current = np.mean(current_array, axis=0)
         else:
-            self.interface.set_Chan_trigger(
+            self.ad2.set_Chan_trigger(
                 0, trig_th, hysteresis=0.01, type="Rising", position=0, ref="left"
             )  # Improvement: use internal trigger instead
-            t = self.interface.set_acq(freq=fs, samples=N_pts)
-            voltage, current = self.interface.acq()
+            t = self.ad2.set_acq(freq=fs, samples=N_pts)
+            voltage, current = self.ad2.acq()
         if filter:
             cutoff = 10 * (1 / period)
             order = 2
@@ -646,25 +646,25 @@ class BIMMS(BIMMSconfig):
 
         trig_th = 0
 
-        self.interface.in_set_channel(channel=0, Vrange=vrange1, Voffset=0)
-        self.interface.in_set_channel(channel=1, Vrange=vrange2, Voffset=0)
-        self.interface.triangle(channel=0, freq=1 / period, amp=amp, offset=0)
+        self.ad2.in_set_channel(channel=0, Vrange=vrange1, Voffset=0)
+        self.ad2.in_set_channel(channel=1, Vrange=vrange2, Voffset=0)
+        self.ad2.triangle(channel=0, freq=1 / period, amp=amp, offset=0)
         if n_delay:
             print("Wait for settling...")
             sleep(n_delay * period)
         print("Measuring...")
-        t = self.interface.set_acq(freq=fs, samples=N_pts)
-        voltage, current = self.interface.acq()
+        t = self.ad2.set_acq(freq=fs, samples=N_pts)
+        voltage, current = self.ad2.acq()
         if n_avg > 0:
             current_array = []
             voltage_array = []
             for i in range(n_avg):
                 print("Average: " + str(i + 1))
-                self.interface.set_Chan_trigger(
+                self.ad2.set_Chan_trigger(
                     0, trig_th, hysteresis=0.01, type="Rising", position=0, ref="left"
                 )  # Improvement: use internal trigger instead
-                t = self.interface.set_acq(freq=fs, samples=N_pts)
-                voltage, current = self.interface.acq()
+                t = self.ad2.set_acq(freq=fs, samples=N_pts)
+                voltage, current = self.ad2.acq()
                 voltage_array.append(voltage)
                 current_array.append(current)
             voltage_array = np.array(voltage_array)
@@ -672,11 +672,11 @@ class BIMMS(BIMMSconfig):
             voltage = np.mean(voltage_array, axis=0)
             current = np.mean(current_array, axis=0)
         else:
-            self.interface.set_Chan_trigger(
+            self.ad2.set_Chan_trigger(
                 0, trig_th, hysteresis=0.01, type="Rising", position=0, ref="left"
             )  # Improvement: use internal trigger instead
-            t = self.interface.set_acq(freq=fs, samples=N_pts)
-            voltage, current = self.interface.acq()
+            t = self.ad2.set_acq(freq=fs, samples=N_pts)
+            voltage, current = self.ad2.acq()
         if filter:
             cutoff = 10 * (1 / period)
             order = 2

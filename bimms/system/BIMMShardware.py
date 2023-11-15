@@ -23,7 +23,7 @@ from warnings import warn
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
-from ..backend.BIMMS_Class import BIMMS_class
+from .BIMMSad2 import BIMMSad2
 from ..utils.functions import convert
 from ..utils import constants as cst
 
@@ -35,10 +35,12 @@ verbose = True
 ##############################
 ## CLASS FOR BIMMS HANDLING ##
 ##############################
-class BIMMShardware(BIMMS_class):
+class BIMMShardware(BIMMSad2):
     @abstractmethod
     def __init__(self, bimms_id=None, serialnumber=None):
         super().__init__()
+
+        self.__start_STM32_com()
         '''
         # default values for gains of all channels
         self.CalFile = ""
@@ -48,7 +50,6 @@ class BIMMShardware(BIMMS_class):
         self.Gain_High_current = 1 / 5000
         self.Gain_Low_current = 1 / 50000
         self.OSLCalibration = False
-        self.cal_folder = "./CalibrationData/"
         self.OSL_cal_data = 0
         '''
 
@@ -97,66 +98,9 @@ class BIMMShardware(BIMMS_class):
         self.IO6_value = 0
         self.IO7_value = 0
 
-        # To maintain connection use keep_on
-        self.switch_off = True
-        self.interface_on = False
-
-        self.__start_interface(bimms_id=bimms_id, serialnumber=serialnumber)
-        self.__DIO_init()
-
-
-    def __del__(self):
-        if self.switch_off and self.interface_on:
-            self.close()
-
-    def close(self):
-        self.set_state(cst.STM32_stopped)
-        self.interface.close()
-        self.interface_on = False
-        if verbose:
-            print("device closed")
-
-    def keep_on(self):
-        self.switch_off = False
-
-    def keep_off(self):
-        self.switch_off = True
-
-    def __start_interface(self, bimms_id, serialnumber):
-        selected = False
-        if isinstance(bimms_id, int):
-            if bimms_id in cst.BimmsSerialNumbers:
-                self.serialnumber = cst.BimmsSerialNumbers[bimms_id]
-                selected = True
-            else:
-                print(
-                    "warning 'bimms_id' not referentced: first device will be selected"
-                )
-                exit()
-        elif isinstance(serialnumber, str):
-            if serialnumber in cst.BimmsSerialNumbers.values():
-                self.serialnumber
-                selected = True
-            else:
-                print(
-                    "warning 'serialnumber' not referentced: first device will be selected"
-                )
-                exit()
-
-        if selected:
-            self.interface = ai.Andi(self.serialnumber)
-        else:
-            self.interface = ai.Andi()
-            self.serialnumber = self.interface.serialnumber
-        self.interface_on = True
-        if verbose:
-            print("device opened")
-        self.ID = 0
-
+    def __start_STM32_com(self):
         self.SPI_init_STM32()
-
         self.ID = self.get_board_ID()
-
         if self.ID == 0 or self.ID > 16:  # only 8 bimms for now
             self.close()
             if verbose:
@@ -168,54 +112,12 @@ class BIMMShardware(BIMMS_class):
         if verbose:
             print("You are connected to BIMMS " + str(self.ID))
 
-
-    def __del__(self):
-        if self.switch_off and self.interface_on:
-            self.close()
-
-
-    def keep_on(self):
-        self.switch_off = False
-
-    def keep_off(self):
-        self.switch_off = True
-
-
+    def close(self):
+        self.set_state(cst.STM32_stopped)
+        super().close()
     #################################
     ## SPI communitation methods ##
     #################################
-    def SPI_init(self, clk, clk_p, mosi_p, miso_p, cs_p):
-        """
-        init an spi communication
-        """
-        self.interface.SPI_reset()
-        self.interface.set_SPI_frequency(clk)
-        self.interface.set_SPI_Clock_channel(clk_p)
-        self.interface.set_SPI_Data_channel(ai.SPIDataIdx["DQ0_MOSI_SISO"], mosi_p)
-        self.interface.set_SPI_Data_channel(ai.SPIDataIdx["DQ1_MISO"], miso_p)
-        self.interface.set_SPI_mode(ai.SPIMode["CPOL_1_CPA_1"])
-        self.interface.set_SPI_MSB_first()
-        self.interface.set_SPI_CS(cs_p, ai.LogicLevel["H"])
-
-    def SPI_write_32(self, cs_p, value):
-        """ """
-        tx_8bvalues = convert(value)
-        self.interface.SPI_select(cs_p, ai.LogicLevel["L"])
-        for k in tx_8bvalues:
-            self.interface.SPI_write_one(ai.SPI_cDQ["MOSI/MISO"], 8, k)
-        self.interface.SPI_select(cs_p, ai.LogicLevel["H"])
-
-    def SPI_read_32(self, cs_p):
-        """ """
-        offsets = [2**24, 2**16, 2**8, 2**0]
-        value = 0
-        self.interface.SPI_select(cs_p, ai.LogicLevel["L"])
-        for k in offsets:
-            rx = self.interface.SPI_read_one(ai.SPI_cDQ["MOSI/MISO"], 8)
-            value += rx * k
-        self.interface.SPI_select(cs_p, ai.LogicLevel["H"])
-        return value
-
     def SPI_init_STM32(self):
         self.SPI_init(
             cst.STM32_CLK,
@@ -472,7 +374,7 @@ class BIMMShardware(BIMMS_class):
     ## AD2 Digital IO methods for gains control ##
     ##############################################
     def __DIO_init(self):
-        self.interface.configure_digitalIO()
+        super().__DIO_init()
         self.set_DIO_mode()
 
     def set_DIO_mode(self):
@@ -491,7 +393,7 @@ class BIMMShardware(BIMMS_class):
         IO_vector += cst.CH2_A1_0
         IO_vector += cst.CH2_A0_1
         IO_vector += cst.CH2_A1_1
-        self.interface.digitalIO_set_as_output(IO_vector)
+        self.ad2.digitalIO_set_as_output(IO_vector)
 
     def set_DIO_output(self):
         OUTPUT_vector = 0
@@ -509,7 +411,7 @@ class BIMMShardware(BIMMS_class):
         OUTPUT_vector += self.CH2_A0_1 * cst.CH2_A0_1
         OUTPUT_vector += self.CH2_A1_1 * cst.CH2_A1_1
 
-        self.interface.digitalIO_output(OUTPUT_vector)
+        self.ad2.digitalIO_output(OUTPUT_vector)
 
     def set_gain_ch1_1(self, value):
         if (

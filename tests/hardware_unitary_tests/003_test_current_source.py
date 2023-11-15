@@ -119,9 +119,9 @@ BS.G_EIS_gain = "LOW"
 BS.config.excitation_coupling("DC")
 BS.set_config()
 
-BS.interface.configure_network_analyser()
+BS.ad2.configure_network_analyser()
 vrange = round(amp,2)
-freq, gain_mes, phase_mes, gain_ch1 = BS.interface.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
+freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
 mean_gain = np.mean(gain_ch1)
 mean_current = mean_gain/load
 max_current = amp * 2.2/low_gain_max
@@ -139,9 +139,9 @@ if (mean_current<min_current):
 
 BS.G_EIS_gain = "HIGH"
 BS.set_config()
-BS.interface.configure_network_analyser()
+BS.ad2.configure_network_analyser()
 vrange = round(amp,2)
-freq, gain_mes, phase_mes, gain_ch1 = BS.interface.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
+freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
 mean_gain = np.mean(gain_ch1)
 mean_current = mean_gain/load
 max_current = amp * 2.2/high_gain_max

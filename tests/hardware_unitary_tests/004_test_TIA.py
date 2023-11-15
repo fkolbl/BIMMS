@@ -80,9 +80,9 @@ BS.config.excitation_signaling_mode("SE")
 BS.config.recording_mode("BOTH")
 
 BS.set_config()
-BS.interface.configure_network_analyser()
+BS.ad2.configure_network_analyser()
 vrange = round(amp,2)
-freq, gain_mes, phase_mes, gain_ch1 = BS.interface.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
+freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
 mean_r = np.mean(gain_mes)*gain_TIA
 error = 100*(np.abs(mean_r-load)/load)
 print("Measured R (TIA DC-SE): " +str(np.round(mean_r,6)) +'Ohms')
@@ -92,9 +92,9 @@ if (np.abs(error)>tolerance):
 
 BS.config.excitation_signaling_mode("DIFF")
 BS.set_config()
-BS.interface.configure_network_analyser()
+BS.ad2.configure_network_analyser()
 vrange = round(amp,2)
-freq, gain_mes, phase_mes, gain_ch1 = BS.interface.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
+freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
 mean_r = np.mean(gain_mes)*gain_TIA
 error = 100*(np.abs(mean_r-load)/load)
 print("Measured R (TIA DC-DIFF): " +str(np.round(mean_r,6)) +'Ohms')

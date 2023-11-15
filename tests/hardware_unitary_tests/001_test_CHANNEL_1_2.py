@@ -44,7 +44,7 @@ if (test_ch1):
 	BS.set_STM32_idle()
 	BS.set_recording_channel_1(coupling = 'DC', gain = gain_IA)
 	BS.set_config()
-	BS.interface.configure_network_analyser()
+	BS.ad2.configure_network_analyser()
 	for idx in range (len(gain_array_IA)):
 		gain_IA = gain_array_IA [idx]
 		print('Gain IA: ',gain_IA,'V/V')
@@ -52,7 +52,7 @@ if (test_ch1):
 		print('AWG Amplitude: ',amp_awg,'V')
 		BS.set_gain_IA(channel=1, gain=gain_IA)
 		vrange = round(amp_awg * gain_IA * 1.5,2)
-		freq, gain_mes, phase_mes, gain_ch1 = BS.interface.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp_awg,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
+		freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp_awg,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
 		mean_gain = np.mean(gain_ch1)
 		error = 100*np.abs(mean_gain-gain_IA)/gain_IA
 		print("Measured GAIN: " +str(np.round(mean_gain,6)) +'V/V')
@@ -102,7 +102,7 @@ if test_ch2:
 	BS.set_STM32_idle()
 	BS.set_recording_channel_2(coupling = 'DC', gain = gain_IA)
 	BS.set_config()
-	BS.interface.configure_network_analyser()
+	BS.ad2.configure_network_analyser()
 	for idx in range (len(gain_array_IA)):
 		gain_IA = gain_array_IA [idx]
 		print('Gain IA: ',gain_IA,'V/V')
@@ -110,7 +110,7 @@ if test_ch2:
 		print('AWG Amplitude: ',amp_awg,'V')
 		BS.set_gain_IA(channel=2, gain=gain_IA)
 		vrange = round(amp_awg * gain_IA * 1.5,2)
-		freq, gain_mes, phase_mes, gain_ch1 = BS.interface.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp_awg,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
+		freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp_awg,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
 		gain_ch2 = gain_ch1/gain_mes
 		mean_gain = np.mean(gain_ch2)
 		error = 100*np.abs(mean_gain-gain_IA)/gain_IA
