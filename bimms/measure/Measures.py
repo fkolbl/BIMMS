@@ -36,20 +36,40 @@ def EIS(BS,fmin=1e2,fmax=1e7,n_pts=501,offset=0,settling_time=0.1,NPeriods=32,ap
     BS.ad2.configure_network_analyser()	#need to be checked
     offset_AWG = offset*GAIN
 
-    #TO CHECK!!
-    verbose = True
-    freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(
-        fmin,
-        fmax,
-        n_points=n_pts,
-        dB=False,
-        offset=offset,
-        deg=True,
-        amp=0.1,
-        settling_time=settling_time,
-        Nperiods=NPeriods,
-        verbose=verbose,
-    )
+	#TO CHECK!!
+	verbose = True
+	offset_CH1 = 0
+	offset_CH2 = 0
+	Vrange_CH1 = 1
+	Vrange_CH2 = 1
+
+
+	if 2 * Vrange_CH1 > 5.0:
+		Vrange_CH1 = 50.0
+	else:
+		Vrange_CH1 = 5.0
+
+	if 2 * Vrange_CH2 > 5.0:
+		Vrange_CH2 = 50.0
+	else:
+		Vrange_CH2 = 5.0
+
+	freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(
+		fmin,
+		fmax,
+		n_points=n_pts,
+		dB=False,
+		offset=offset,
+		deg=True,
+		amp=0.1,
+		settling_time=settling_time,
+		Nperiods=NPeriods,
+		Vrange_CH1=Vrange_CH1,
+		Vrange_CH2=Vrange_CH2,
+		offset_CH1=offset_CH1,
+		offset_CH2=offset_CH2,
+		verbose=verbose,
+	)
 
     mag = gain_mes * Gain_TIA	
     phase = phase_mes - 180
@@ -71,10 +91,14 @@ def TemporalSingleFrequency(BS,amp,Freq,Phase = 0,Symmetry = 50,Nperiod=1,Delay 
     amp_AWG =  amp_stim*GAIN 					#need to be changed with calibrated or uncalibrated gain
     AWG_offset = 0.02 								#in calibration
 
-    
-    # set the generators
-    BS.AWG_sine(freq=Freq, amp=amp_AWG,activate = False,offset = AWG_offset, phase = Phase,
-                           symmetry = Symmetry)
+	AD2_VRO_range = 5.0							#in calibration
+	AD2_VRO_offset = 0.0
+	AD2_IRO_range = 5.0
+	AD2_IRO_offset = 0.0
+	
+	# set the generators
+	BS.AWG_sine(freq=Freq, amp=amp_AWG,activate = False,offset = AWG_offset, phase = Phase,
+				   		symmetry = Symmetry)
 
     Fs_max = BS.AD2_input_Fs_max
     Npts = BS.AD2_input_buffer_size
@@ -87,10 +111,10 @@ def TemporalSingleFrequency(BS,amp,Freq,Phase = 0,Symmetry = 50,Nperiod=1,Delay 
     BS.Set_AWG_trigger(delay=Delay)
     t = BS.set_acquistion(fs, Npts)
 
-    BS.AWG_enable(True)
-    chan1, chan2 = BS.get_input_data()
-
-    BS.AWG_enable(False)
+	BS.AWG_enable(True)
+	chan1, chan2 = BS.get_input_data()
+	
+	BS.AWG_enable(False)
 
     #Here --> convert chan1, chan2 with calibration data
 
