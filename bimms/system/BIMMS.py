@@ -27,6 +27,7 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
 from .BIMMSconfig import BIMMSconfig
 from .BIMMScalibration import BIMMScalibration
+from ..measure.Measure import Measure
 
 ### for debug
 faulthandler.enable()
@@ -39,20 +40,31 @@ verbose = True
 class BIMMS(BIMMSconfig):
     def __init__(self, bimms_id=None, serialnumber=None):
         super().__init__(bimms_id=bimms_id, serialnumber=serialnumber)
+        self.measures = []
+        self.results
 
     def attach_calibrator(self, calibrator):
         pass
 
-    def attach_measure(self, measure):
-        pass
+    def attach_measure(self, m : Measure):
+        self.measures += m
 
 
     def callibrate(self):
         pass
 
 
-    def measure(self):
+
+    def check_measures_config():
         pass
+
+    def measure(self):
+        self.check_config()
+        self.set_config()
+        for m in self.measures:
+            m.measure(self)
+
+
     #########################
     ## Measurement Methods ##
     #########################
