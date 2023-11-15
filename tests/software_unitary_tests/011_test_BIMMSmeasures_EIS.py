@@ -13,15 +13,17 @@ BS.config.G_EIS_gain = "LOW"
 BS.config.IRO_gain = 1
 BS.config.VRO_gain = 1
 BS.config.DC_feedback = False
-BS.config.V_amplitude = 50 # mV
+BS.config.I_amplitude = 100 # uA
+BS.config.V_amplitude = 250 # mV
 
+for i in range(3):
+    BS.attach_measure(bm.EIS(fmin=100,fmax=1e5,n_pts=101,settling_time=0.01,NPeriods=8, ID=i))
 
-m1 = bm.EIS(fmin=1000,fmax=1e7,n_pts=101,settling_time=0.01,NPeriods=8)
-BS.attach_measure(m1)
 results = BS.measure()
 del BS
 
 plt.figure()
-plt.semilogx(results['freq'],results['mag'])
+for i in range(3):
+    plt.semilogx(results[i]['freq'],results[i]['mag'])
 plt.show()
 

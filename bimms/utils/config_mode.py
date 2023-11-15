@@ -28,7 +28,7 @@ def is_float_str(string):
 
 def is_int_str(string):
     try:
-        return int(string) == float(string)
+        return int(string) != float(string)
     except ValueError:
         return False
 

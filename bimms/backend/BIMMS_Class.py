@@ -90,6 +90,7 @@ class BIMMS_class(metaclass=ABCMeta):
         Init method for BIMMS class
         """
         self.__BIMMSObject__ = True
+        self.verbose = True
         self.bimms_type = self.__class__.__name__
         if debug:
             print("DEBUG: ",self.bimms_type, " initialized")

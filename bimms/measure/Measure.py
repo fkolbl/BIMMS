@@ -72,9 +72,10 @@ class EIS(Measure):
         )
 
         if not self.raw:
-            mag, phase = BS.bode2impendance(freq, gain_mes, phase_mes, gain_ch1)
+            mag, phase = BS.bode2impendance(gain_mes, phase_mes, freq, gain_ch1)
 
-        return freq, mag, phase
+        results = {'freq':freq, 'mag':mag, 'phase':phase}
+        return results
 
 class TemporalSingleFrequency(Measure):
     def __init__(self,freq=1e3, phase=0, symmetry=50, Nperiod=8, delay=0, ID=0):
@@ -125,8 +126,11 @@ class TemporalSingleFrequency(Measure):
 
         if not self.raw:
             chan1, chan2 = BS.Scope2calibration(chan1, chan2, t, self.freq)
-        return(t,chan1,chan2)
 
+        results = {'t':t, 'chan1':chan1, 'chan2':chan2}
+        return results
+
+"""
 #Need update
 def Measure_Offset(BS,channel = 1, gain_IA = 1, acq_duration = 1, Nsample = 8192,coupling = 'DC', Vrange = 1, Voffset = 0):
     sampling_freq = Nsample/acq_duration
@@ -247,3 +251,4 @@ def TemporalSingleFrequency(BS,amp,Freq,Phase = 0,Symmetry = 50,Nperiod=1,Delay 
     #pass
 
 
+"""

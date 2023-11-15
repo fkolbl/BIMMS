@@ -73,7 +73,6 @@ test_nb = 0
 failed_test = []
 
 
-print(args.TARGET)
 if args.TARGET:
     for argt in args.TARGET:
         target_script_key = f"{argt:03}"

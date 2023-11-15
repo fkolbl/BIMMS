@@ -24,7 +24,7 @@ from warnings import warn
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
 from .BIMMShardware import BIMMShardware
-from ..utils.config_mode import config_mode, config_mode_list
+from ..utils.config_mode import config_mode, config_range, config_mode_list
 from ..utils import constants as cst
 
 
@@ -60,7 +60,8 @@ class BIMMSconfig(BIMMShardware):
         self.config.add_mode("DC_feedback", config_mode(True, False, default=False))
 
         # Signals
-        #self.I_amplitude = config_mode("", "None", default="None")
+        self.config.add_mode("I_amplitude", config_range(cst.min_current, cst.max_current, default=cst.default_current))
+        self.config.add_mode("V_amplitude", config_range(cst.min_voltage, cst.max_voltage, default=cst.default_voltage))
 
     ####################
     ## Save and load  ##
@@ -313,4 +314,6 @@ class BIMMSconfig(BIMMShardware):
 
         self.set_gain_IA(channel=2, gain=gain)
 
-    
+    #############################
+    ## set exitation magnitude ##
+    #############################

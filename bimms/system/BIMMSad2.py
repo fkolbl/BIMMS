@@ -51,6 +51,7 @@ class BIMMSad2(BIMMS_class):
         available_ranges = self.AD2_get_input_ranges()
         self.AD2_input_range = min(available_ranges)                    #Both AD2 Input range are set to min by default (should be about 2.0V)
         self.AD2_set_input_range(-1,self.AD2_input_range)
+        self.AD2_input_average_filter()
 
 
     def __start_ad2(self, bimms_id, serialnumber):
