@@ -26,11 +26,13 @@ for the third party softwares, please visit:
 # TODO
     - Add defaults gains (gain_SE, gain_DIFF, etc) in cst files and add use them in examples/tests/selftests --> en cours
     - Add selftests capabilities 
-    - Add measurement methods/class --> en cours
-    - Set G_EIS/P_EIS when voltage/current excitation magnitude 
-    - Add calibration routines 
-    - Double check excitation/readout signaling
+    - Add measurement methods/class --> skeleton OK 
+    - Add calibration routines --> skeleton OK 
+    - Double check excitation/readout signaling 
     - Comments
     - add verbosity mode
     - do "standard configuration" 
-    - add check_saturation
+    - add check_saturation 
+    - change HIGH/LOW GAIN 
+    - Test multiple measurements in a row
+    - results class
