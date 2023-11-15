@@ -95,36 +95,30 @@ def TemporalSingleFrequency(BS,amp,Freq,Phase = 0,Symmetry = 50,Nperiod=1,Delay 
 	AD2_VRO_offset = 0.0
 	AD2_IRO_range = 5.0
 	AD2_IRO_offset = 0.0
-
 	
 	# set the generators
-	BS.ad2.sine(channel=BIMMScst.AD2_AWG_ch, freq=Freq, amp=amp_AWG,activate = False,offset = AWG_offset, phase = Phase,
+	BS.AWG_sine(freq=Freq, amp=amp_AWG,activate = False,offset = AWG_offset, phase = Phase,
 				   		symmetry = Symmetry)
 
-    #set acquisition parameters
-	#BS.ad2.in_set_channel(channel=BIMMScst.AD2_VRO_ch, Vrange=AD2_VRO_range, Voffset=AD2_VRO_offset)							 #to update with AD2config 
-	#BS.ad2.in_set_channel(channel=BIMMScst.AD2_IRO_ch, Vrange=AD2_IRO_range, Voffset=AD2_IRO_offset)							 #to update with AD2config 
-
-	#max Fs
-	Fs_max = BS.ad2.in_frequency_info()[-1]
-	Input_Npts_max = BS.ad2.in_buffer_size_info()[-1]
-	Npts = Input_Npts_max
-	fs = Freq*Input_Npts_max/Nperiod
-
-	n_pts = ()
+	Fs_max = BS.AD2_input_Fs_max
+	Npts = BS.AD2_input_buffer_size
+	fs = Freq*Npts/Nperiod
 
 	while (fs>Fs_max):
 		Npts-=1
-		fs = Freq*Input_Npts_max/Nperiod
+		fs = Freq*Npts/Nperiod
 
-	BS.ad2.set_AWG_trigger(BIMMScst.AD2_AWG_ch,type="Rising",ref="left border", position=Delay)
-	t = BS.ad2.set_acq(freq=fs, samples=Npts)
-	fs_set  =  BS.ad2.in_sampling_freq_get()
+	BS.Set_AWG_trigger(delay=Delay)
+	t = BS.set_acquistion(fs, Npts)
 
-	BS.ad2.out_channel_on(BIMMScst.AD2_AWG_ch)
-	dat0, dat1 = BS.ad2.acq()
-	BS.ad2.out_channel_off(BIMMScst.AD2_AWG_ch)
-	return(t,dat0,dat1)
+	BS.AWG_enable(True)
+	chan1, chan2 = BS.get_input_data()
+	
+	BS.AWG_enable(False)
+
+	#Here --> convert chan1, chan2 with calibration data
+
+	return(t,chan1,chan2)
 	#pass
 
 

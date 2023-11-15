@@ -46,6 +46,12 @@ class BIMMSad2(BIMMS_class):
         self.__start_ad2(bimms_id=bimms_id, serialnumber=serialnumber)
         self.__DIO_init()
 
+        self.AD2_input_Fs_max = self.ad2.in_frequency_info()[-1]        #Maximum input sampling frequency
+        self.AD2_input_buffer_size = self.ad2.in_buffer_size_info()[-1] #Maximum input buffer size 
+        available_ranges = self.AD2_get_input_ranges()
+        self.AD2_input_range = min(available_ranges)                    #Both AD2 Input range are set to min by default (should be about 2.0V)
+        self.AD2_set_input_range(-1,self.AD2_input_range)
+
 
     def __start_ad2(self, bimms_id, serialnumber):
         selected = False
@@ -78,7 +84,7 @@ class BIMMSad2(BIMMS_class):
             print("ad2 device opened")
         self.ID = 0
 
-
+        
     def __del__(self):
         if self.switch_off and self.ad2_on:
             self.close()
@@ -137,3 +143,57 @@ class BIMMSad2(BIMMS_class):
     ############################
     def __DIO_init(self):
         self.ad2.configure_digitalIO()
+
+    ###################
+    ## AD2 Analog IN ##
+    ###################
+
+    def AD2_get_input_ranges(self):
+        return(self.ad2.in_channel_range_info(-1))
+
+    def AD2_set_input_range(self,channel,range):
+        self.ad2.in_channel_range_set(channel,range)
+
+    def AD2_input_decimate_filter(self):
+        self.ad2.in_decimate_filter_mode(-1)
+
+    def AD2_input_average_filter(self):
+        self.ad2.in_average_filter_mode(-1)
+
+    def set_acquistion(self,fs,size):
+        return(self.ad2.set_acq(freq=fs, samples=size))
+
+    def get_input_fs (self):
+        return(self.ad2.in_sampling_freq_get())
+    
+    def get_input_data(self):
+        chan1, chan2 = self.ad2.acq()
+        return(chan1,chan2)
+
+
+    ####################
+    ## AD2 Analog OUT ##
+    ####################
+
+    def AWG_sine(self,freq, amp ,offset, phase ,symmetry,activate = False):
+        self.ad2.sine(channel=cst.AD2_AWG_ch, freq=freq, amp=amp,activate = False,offset = offset, phase = phase,
+				   		symmetry = symmetry)
+        
+    def AWG_enable(self,enable):
+        if (enable == True):
+            self.ad2.out_channel_on(cst.AD2_AWG_ch)
+        else:
+            self.ad2.out_channel_off(cst.AD2_AWG_ch)
+            
+
+
+    ####################
+    ## AD2 Triggers   ##
+    ####################
+
+    def Set_AWG_trigger(self,type="Rising",ref="left border", delay=0):
+        self.ad2.set_AWG_trigger(cst.AD2_AWG_ch,type="Rising",ref="left border", position=delay)
+    
+    
+
+    
