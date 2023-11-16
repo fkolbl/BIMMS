@@ -25,12 +25,17 @@ def is_float_str(string):
         return True
     except ValueError:
         return False
+    except Exception as error:
+        print("WARING: is_float_str: an exception occurred:", error)
 
 def is_int_str(string):
     try:
         return int(string) != float(string)
     except ValueError:
         return False
+    except Exception as error:
+    # handle the exception
+        print("WARING: is_int_str: an exception occurred:", error)
 
 class config_mode(BIMMS_class):
     def __init__(self, *args, **kwargs):
@@ -77,10 +82,19 @@ class config_mode(BIMMS_class):
         return "['config_mode' : "+ self.value + " "+ modes_str + "]"
 
     def __int__(self):
-        try:
+        if is_int_str(self.value):
             return int(self.value)
-        except:
-            print("Warning :", self.value, " cannot be converted to int")
+        elif is_float_str(self.value):
+            print('INFO:' + self.value + 'float is converted to int')
+            return int(self.value)
+        else:
+            print("WARNING :", self.value, " cannot be converted to int")
+
+    def __float__(self):
+        if is_float_str(self.value):
+            return int(self.value)
+        else:
+            print("WARNING :", self.value, " cannot be converted to float")
 
     def get_modes(self, verbose=True):
         """
