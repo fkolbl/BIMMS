@@ -40,8 +40,12 @@ class BIMMSconfig(BIMMShardware):
     def __init__(self, bimms_id=None, serialnumber=None):
         super().__init__(bimms_id=bimms_id, serialnumber=serialnumber)
 
+        self.set_STM32_idle()
+
 
         self.config = config_mode_list()
+        self.test_config = config_mode_list()
+        self.config_mode = config_mode("MEASURE" ,"TEST", default="MEASURE")
 
         ## Measeremenet
         self.config.add_mode("excitation_sources", config_mode("EXTERNAL" ,"INTERNAL", default="INTERNAL"))
@@ -52,16 +56,41 @@ class BIMMSconfig(BIMMShardware):
         self.config.add_mode("readout_coupling", config_mode("AC", "DC", default="DC"))
         self.config.add_mode("recording_mode",  config_mode("I", "V", "BOTH",default="BOTH"))
         self.config.add_mode("recording_signaling_mode", config_mode("SE", "DIFF", "AUTO", default="AUTO"))
+        self.config.add_mode("DC_feedback", config_mode(True, False, default=False))
 
         # gains
         self.config.add_mode("G_EIS_gain", config_mode("LOW", "HIGH", "AUTO", default="AUTO"))
         self.config.add_mode("IRO_gain", config_mode(*cst.gain_array.tolist(), default=1))
         self.config.add_mode("VRO_gain", config_mode(*cst.gain_array.tolist(), default=1))
-        self.config.add_mode("DC_feedback", config_mode(True, False, default=False))
-
+        
         # Signals
         self.config.add_mode("I_amplitude", config_range(cst.min_current, cst.max_current, default=cst.default_current))
         self.config.add_mode("V_amplitude", config_range(cst.min_voltage, cst.max_voltage, default=cst.default_voltage))
+
+
+        #TEST CONFIG (Excitation)
+        self.test_config.add_mode("waveform_gen", config_mode("EXTERNAL" ,"INTERNAL", default="INTERNAL"))
+        self.test_config.add_mode("excitation_source",  config_mode("CURRENT", "VOLTAGE","NONE", default="NONE"))
+        self.test_config.add_mode("I_source_gain", config_mode("LOW", "HIGH", default="HIGH"))
+        self.test_config.add_mode("wire_mode",  config_mode("2_WIRE", "4_WIRE", "2", "4",default="2_WIRE"))
+        self.test_config.add_mode("excitation_signaling_mode", config_mode("SE", "DIFF", default="SE"))
+        self.test_config.add_mode("excitation_coupling", config_mode("AC", "DC", default="DC"))
+        self.test_config.add_mode("DC_feedback", config_mode(True, False, default=False))
+        self.test_config.add_mode("Enable_Isource", config_mode(True, False, default=True))
+        self.test_config.add_mode("AWG_amp", config_range(cst.min_AWG_amp, cst.max_AWG_amp, default=cst.min_AWG_amp))
+        self.test_config.add_mode("AWG_offset", config_range(cst.min_AWG_amp, cst.max_AWG_amp, default=cst.min_AWG_amp))
+
+        #TEST CONFIG (Readout)
+        self.test_config.add_mode("CHx_to_Scopex", config_mode("CH1" ,"CH2","BOTH","NONE", default="NONE"))
+        self.test_config.add_mode("CH1_coupling", config_mode("AC", "DC", default="DC"))
+        self.test_config.add_mode("CH2_coupling", config_mode("AC", "DC", default="DC"))
+        self.test_config.add_mode("TIA_coupling", config_mode("AC", "DC", default="DC"))
+        self.test_config.add_mode("TIA_to_CH2", config_mode(True, False, default=False))
+        self.test_config.add_mode("TIA_NEG", config_mode("GND" ,"Vneg","Ineg", default="GND"))
+        self.test_config.add_mode("CH1_gain", config_mode(*cst.gain_array.tolist(), default=1))
+        self.test_config.add_mode("CH2_gain", config_mode(*cst.gain_array.tolist(), default=1))
+
+
 
     ####################
     ## Save and load  ##
@@ -129,21 +158,27 @@ class BIMMSconfig(BIMMShardware):
         """
         
         """
-        self.set_STM32_idle()
-        if self.config.wire_mode == "2" or self.config.wire_mode == "2_WIRE":
-            self.set_2_wires_mode()
-        else:   # 4
-            self.set_4_wires_mode()
-        self.set_exitation_config()
-        self.set_recording_config()
+        if (self.config_mode == "MEASURE"):
+            
+            if self.config.wire_mode == "2" or self.config.wire_mode == "2_WIRE":
+                self.set_2_wires_mode()
+            else:   # 4
+                self.set_4_wires_mode()
+            self.set_exitation_config()
+            self.set_recording_config()
+        else :
+            self.set_test_config()
 
         # Send the configuration to set the relays
         if (send):
             self.send_config()
 
-    def reset_config():
-        print("WARNING: RESET CONFIG NOT IMPLEMENTED")
-        pass # TO IMPLEMENT
+    def reset_config(self):
+        self.config_mode("MEASURE")
+        self.config.reset()
+        self.test_config.reset()
+        self.set_config(send = False)
+        print("INFO: BIMMS config reset!")
 
     def set_exitation_config(self):
         """
@@ -244,76 +279,116 @@ class BIMMSconfig(BIMMShardware):
                 print("WARNING: Manual connection between V- and GND required (check CH1 jumper)")
 
     #######################################
-    ##  excitation source config methods ##
+    ##  test config methods ##
     #######################################
-    def set_current_excitation(
-        self,
-        coupling="DC",
-        differential_stim=True,
-        DC_feedback=False,
-        Internal_AWG=True,
-        High_gain=False,
-    ):
-        warn('Deprecated: consider using explicit configuration instead."', DeprecationWarning, stacklevel=2)
-        self.config.excitation_mode("G_EIS")
-        self.config.excitation_coupling(coupling)
-        self.config.DC_feedback(DC_feedback)
-        if differential_stim:
-            self.config.excitation_signaling_mode("DIFF")
-        else:
-            self.config.excitation_signaling_mode("SE")
-        if High_gain:
-            self.config.G_EIS_gain("HIGH")
-        else:
-            self.config.G_EIS_gain("LOW")
 
-        if Internal_AWG:
-            self.config.excitation_sources("INTERNAL")
-        else:
-            self.config.excitation_sources("EXTERNAL")
+    def set_test_config(self):
+        print("INFO: BIMMS set to test mode.")
+        if self.test_config.wire_mode == "2" or self.test_config.wire_mode == "2_WIRE":
+            self.set_2_wires_mode()
+        else:   # 4
+            self.set_4_wires_mode()
 
-    def set_voltage_excitation(
-        self, coupling="DC", differential_stim=True, Internal_AWG=True
-    ):
-        warn('Deprecated: consider using explicit configuration instead."', DeprecationWarning, stacklevel=2)
-        self.config.excitation_mode("P_EIS")
-        self.config.excitation_coupling(coupling)
-        if differential_stim:
-            self.config.excitation_signaling_mode("DIFF")
-        else:
-            self.config.excitation_signaling_mode("SE")
-        if Internal_AWG:
-            self.config.excitation_sources("INTERNAL")
-        else:
-            self.config.excitation_sources("EXTERNAL")
+        self.set_test_excitation_config()
+        self.set_test_readout_config()
 
-    ######################################
-    ## high-level configuration methods ##
-    ######################################
-    def set_recording_channel_1(self, coupling="DC", gain=1.0):
-        """
-                
-        """
-        self.connect_CH1_to_scope_1()
-        if coupling == "DC":
-            self.set_CH1_DC_coupling()
+    def set_test_excitation_config(self):
+        if (self.test_config.waveform_gen) == "INTERNAL":
+            self.connect_internal_AWG()
         else:
+            self.connect_external_AWG()
+
+        self.set_excitation_source()
+        if (self.test_config.excitation_coupling == "DC"):
+            self.set_Stim_DC_coupling()
+        else:
+            self.set_Stim_AC_coupling()
+        
+        if (self.test_config.DC_feedback):
+            self.enable_DC_feedback()
+        else:
+            self.disable_DC_feedback()
+        
+        if (self.test_config.Enable_Isource):
+            self.enable_current_source()
+        else:
+            self.disable_current_source()
+
+    def set_excitation_source(self):
+        if (self.test_config.excitation_source == "NONE"):
+            self.disconnect_StimNeg()
+            self.disconnect_StimPos()
+        elif (self.test_config.excitation_source == "CURRENT"):
+            self.connect_Ipos_to_StimPos()
+            if (self.test_config.excitation_signaling_mode == "SE"):
+                self.connect_GND_to_StimNeg()
+            else:
+                self.connect_Ineg_to_StimNeg()
+
+            if (self.test_config.I_source_gain == "LOW"):
+                self.set_low_gain_current_source()
+            else:
+                self.set_high_gain_current_source()
+        else: 
+            self.connect_Vpos_to_StimPos()
+            if (self.test_config.excitation_signaling_mode == "SE"):
+                self.connect_GND_to_StimNeg()
+            else:
+                self.connect_Vneg_to_StimNeg()
+    
+    def set_test_readout_config(self):
+        self.set_test_CHx_to_SCOPEx()
+
+        self.set_gain_IA(channel=1, gain=int(self.test_config.CH1_gain))
+        self.set_gain_IA(channel=2, gain=int(self.test_config.CH2_gain))
+
+        self.set_readout_coupling()
+        self.connect_TIA()
+
+    def connect_TIA(self):
+        if (self.test_config.TIA_to_CH2):
+            self.connect_TIA_to_CH2()
+        else:
+            self.disconnect_TIA_from_CH2()
+        
+        if (self.test_config.TIA_NEG == "GND"):
+            self.connect_TIA_Neg_to_ground()
+
+        elif (self.test_config.TIA_NEG == "Vneg"):
+            self.connect_TIA_Neg_to_Vneg
+        
+        else:
+             self.connect_TIA_Neg_to_Ineg
+
+    def set_test_CHx_to_SCOPEx(self):
+        if (self.test_config.CHx_to_Scopex == "NONE"):
+            self.disconnect_CH2_from_scope_2()
+            self.disconnect_CH1_from_scope_1()
+        elif  (self.test_config.CHx_to_Scopex == "CH1"):
+            self.disconnect_CH2_from_scope_2()
+            self.connect_CH1_to_scope_1()
+        elif  (self.test_config.CHx_to_Scopex == "CH2"):
+            self.disconnect_CH1_from_scope_1()
+            self.connect_CH2_to_scope_2()
+        else:
+            self.connect_CH2_to_scope_2()
+            self.connect_CH1_to_scope_1()
+
+    def set_readout_coupling(self):
+        if (self.test_config.CH1_coupling == "AC"):
             self.set_CH1_AC_coupling()
-
-        self.set_gain_IA(channel=1, gain=gain)
-
-    def set_recording_channel_2(self, coupling="DC", gain=1.0):
-        """
-                
-        """
-        self.connect_CH2_to_scope_2()
-        if coupling == "DC":
-            self.set_CH2_DC_coupling()
         else:
+            self.set_CH1_DC_coupling()
+        
+        if (self.test_config.CH2_coupling == "AC"):
             self.set_CH2_AC_coupling()
+        else:
+            self.set_CH2_DC_coupling()
 
-        self.set_gain_IA(channel=2, gain=gain)
+        if (self.test_config.TIA_coupling == "AC"):
+            self.set_TIA_AC_coupling()
+        else:
+            self.set_TIA_DC_coupling()
 
-    #############################
-    ## set exitation magnitude ##
-    #############################
+
+       

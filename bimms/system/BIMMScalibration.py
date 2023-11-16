@@ -17,10 +17,6 @@
 import sys
 import os
 import faulthandler
-import numpy as np
-import os
-import json
-from time import sleep
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
@@ -74,35 +70,40 @@ class BIMMScalibration(BIMMSconfig):
         self.get_calibration()
         unit = 1
 
-        if self.config.excitation_mode == "P_EIS":
-            self.awg_amp = self.config.V_amplitude
-            unit = cst.V2mV
-            if self.config.excitation_signaling_mode == "DIFF":
-                self.awg_offset = cst.voltage_DIFF_offset_default
-                self.awg_gain = 1 / cst.Vsource_DIFF_G_default
-            else:   # SE
-                self.awg_offset = cst.voltage_SE_offset_default
-                self.awg_gain = 1 / cst.Vsource_SE_G_default
-        else: # P_EIS
-            self.awg_amp = self.config.I_amplitude
-            unit = cst.A2uA
-            if self.config.G_EIS_gain == "LOW":
-                self.awg_gain =  cst.Isource_LowR_default / cst.Vsource_DIFF_G_default
+        if (self.config_mode == "MEASURE"):
+            if self.config.excitation_mode == "P_EIS":
+                self.awg_amp = float(self.config.V_amplitude)
+                unit = cst.V2mV
                 if self.config.excitation_signaling_mode == "DIFF":
-                    self.awg_offset = cst.current_LowR_DIFF_offset_default
-                else: #SE
-                    self.awg_offset = cst.current_LowR_SE_offset_default
-            else:   #HIGH
-                self.awg_gain = cst.Isource_HighR_default / cst.Vsource_DIFF_G_default
-                if self.config.excitation_signaling_mode == "DIFF":
-                    self.awg_offset = cst.current_HighR_DIFF_offset_default
-                else: #SE
-                    self.awg_offset = cst.current_HighR_SE_offset_default
+                    self.awg_offset = cst.voltage_DIFF_offset_default
+                    self.awg_gain = 1 / cst.Vsource_DIFF_G_default
+                else:   # SE
+                    self.awg_offset = cst.voltage_SE_offset_default
+                    self.awg_gain = 1 / cst.Vsource_SE_G_default
+            else: # P_EIS
+                self.awg_amp = float(self.config.I_amplitude)
+                unit = cst.A2uA
+                if self.config.G_EIS_gain == "LOW":
+                    self.awg_gain =  cst.Isource_LowR_default / cst.Vsource_DIFF_G_default
+                    if self.config.excitation_signaling_mode == "DIFF":
+                        self.awg_offset = cst.current_LowR_DIFF_offset_default
+                    else: #SE
+                        self.awg_offset = cst.current_LowR_SE_offset_default
+                else:   #HIGH
+                    self.awg_gain = cst.Isource_HighR_default / cst.Vsource_DIFF_G_default
+                    if self.config.excitation_signaling_mode == "DIFF":
+                        self.awg_offset = cst.current_HighR_DIFF_offset_default
+                    else: #SE
+                        self.awg_offset = cst.current_HighR_SE_offset_default
 
-        if self.calibrated:
-            self.awg_offset = self.cal_awg_offset
-            self.awg_gain = self.cal_awg_gain
-        self.awg_amp *= self.awg_gain * unit
+            if self.calibrated:
+                self.awg_offset = self.cal_awg_offset
+                self.awg_gain = self.cal_awg_gain
+            self.awg_amp *= self.awg_gain * unit
+
+        else:
+            self.awg_amp = float(self.test_config.AWG_amp)
+            self.awg_offset =  float(self.test_config.AWG_offset)
         #self.validate_excitation_parameter()
 
 

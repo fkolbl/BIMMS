@@ -41,17 +41,7 @@ class BIMMShardware(BIMMSad2):
         super().__init__()
 
         self.__start_STM32_com()
-        '''
-        # default values for gains of all channels
-        self.CalFile = ""
-        self.Gain_TIA = 100
-        self.Gain_Voltage_SE = 1.1
-        self.Gain_Voltage_DIFF = 2.2
-        self.Gain_High_current = 1 / 5000
-        self.Gain_Low_current = 1 / 50000
-        self.OSLCalibration = False
-        self.OSL_cal_data = 0
-        '''
+        self.__relay_state = 0
 
         # Relay states
         self.Ch1Coupling = 0
@@ -97,6 +87,8 @@ class BIMMShardware(BIMMSad2):
         self.IO7_IO = 0
         self.IO6_value = 0
         self.IO7_value = 0
+
+        self.set_DIO_mode()
 
     def __start_STM32_com(self):
         self.SPI_init_STM32()
@@ -203,8 +195,13 @@ class BIMMShardware(BIMMSad2):
         """
         Send the one stored in the current object to the stm32 to set relay config
         """
+
         rvector = self.get_config_vector()
-        self.set_relays(rvector)
+        if rvector != self.__relay_state:
+            self.__relay_state = rvector
+            self.set_relays(rvector)
+        
+        
         # error handling to be written here
 
     ###########################################

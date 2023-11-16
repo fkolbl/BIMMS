@@ -4,7 +4,7 @@ import numpy as np
 from ..backend.BIMMS_Class import BIMMS_class, abstractmethod
 from ..system.BIMMScalibration import BIMMScalibration
 from ..utils import constants as BIMMScst
-
+import matplotlib.pyplot as plt
 
 class Measure(BIMMS_class):
     """
@@ -130,125 +130,90 @@ class TemporalSingleFrequency(Measure):
         results = {'t':t, 'chan1':chan1, 'chan2':chan2}
         return results
 
-"""
-#Need update
-def Measure_Offset(BS,channel = 1, gain_IA = 1, acq_duration = 1, Nsample = 8192,coupling = 'DC', Vrange = 1, Voffset = 0):
-    sampling_freq = Nsample/acq_duration
-    BS.set_STM32_idle()
-    if (channel == 1):
-        BS.set_recording_channel_1(coupling = coupling, gain = gain_IA)
-        BS.ad2.in_set_channel(channel=0, Vrange=Vrange, Voffset=Voffset)
-    else:
-        BS.set_recording_channel_2(coupling = coupling, gain = gain_IA)
-        BS.ad2.in_set_channel(channel = 1, Vrange=Vrange, Voffset=Voffset)
-    BS.set_config()
-    BS.ad2.set_Auto_chan_trigger(0, timeout=0.1, type="Rising", ref="center")
-    t = BS.ad2.set_acq(freq=sampling_freq, samples=Nsample)
-    dat0, dat1 = BS.ad2.acq()
-    if(channel == 1):
-        offset = np.mean(dat0)
-    else :
-        offset = np.mean(dat1)
-    return(offset)
+class Offset(Measure):
+    def __init__(self,acq_duration = 1, Navg = 0, ID=0):
+        super().__init__(ID=ID)
+        self.acq_duration = acq_duration
+        self.Navg = Navg
 
-def TemporalAcquistion(BS):
-    pass
+    def set_acq_duration(self, acq_duration):
+        self.set_parameters(acq_duration=acq_duration)
 
-def EIS(BS,fmin=1e2,fmax=1e7,n_pts=501,offset=0,settling_time=0.1,NPeriods=32,apply_cal=True):
+    def set_Navg(self, Navg):
+        self.set_parameters(Navg=Navg)
+                            
+    def measure(self, BS: BIMMScalibration):
+                            
+        BS.AWG_sine(freq=1e3, amp=0,activate = True)  #Dummy sine waveform
+        BS.Set_AUTO_trigger()
+                            
+        Npts = BS.AD2_input_buffer_size
+        fs = Npts/self.acq_duration
+        t = BS.set_acquistion(fs=fs, size=Npts)
+        ch1_offset = []
+        ch2_offset = []
+        if (BS.verbose):
+            print("Measuring Offset...")
+        for n in range (self.Navg):
+            ch1,ch2 = BS.get_input_data()
+            ch1_offset.append(np.mean(ch1))
+            ch2_offset.append(np.mean(ch2))
+        
+        if (BS.verbose):
+            print("Done!")
+        if (self.Navg>1):
+            ch1_offset = np.mean(ch1_offset)
+            ch2_offset = np.mean(ch2_offset)
+        else:
+            ch1_offset = ch1_offset[0]
+            ch2_offset = ch2_offset[0]          
+        
+        if not self.raw:
+            ch1_offset, ch2_offset = BS.Scope2calibration(ch1_offset, ch2_offset, [0])
 
-    BS.set_config()
-
-    GAIN = 1	
-    amp_stim= 0.1								#need to be changed with calibrated or uncalibrated gain
-    Gain_TIA = 100								#need to be changed with calibrated or uncalibrated gain
-    amp_AWG =  amp_stim*GAIN 					#need to be changed with calibrated or uncalibrated gain
-    BS.ad2.configure_network_analyser()	#need to be checked
-    offset_AWG = offset*GAIN
-
-    #TO CHECK!!
-    verbose = True
-    offset_CH1 = 0
-    offset_CH2 = 0
-    Vrange_CH1 = 1
-    Vrange_CH2 = 1
-
-
-    if 2 * Vrange_CH1 > 5.0:
-        Vrange_CH1 = 50.0
-    else:
-        Vrange_CH1 = 5.0
-
-    if 2 * Vrange_CH2 > 5.0:
-        Vrange_CH2 = 50.0
-    else:
-        Vrange_CH2 = 5.0
-
-    freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(
-        fmin,
-        fmax,
-        n_points=n_pts,
-        dB=False,
-        offset=offset,
-        deg=True,
-        amp=0.1,
-        settling_time=settling_time,
-        Nperiods=NPeriods,
-        Vrange_CH1=Vrange_CH1,
-        Vrange_CH2=Vrange_CH2,
-        offset_CH1=offset_CH1,
-        offset_CH2=offset_CH2,
-        verbose=verbose,
-    )
-
-    mag = gain_mes * Gain_TIA	
-    phase = phase_mes - 180
-    if apply_cal:
-        print("Calibration not Implemented")
-
-    return freq, mag, phase
+        results = {
+            'ch1_offset':ch1_offset, 'ch2_offset':ch2_offset}
+        return results
 
 
-def SingleFrequency(BS,xxx):
-    pass
+class Bode(Measure):
+    def __init__(self, fmin=1e3, fmax=1e7, n_pts=101, settling_time=0.001, NPeriods=8, ID=0):
+        super().__init__(ID=ID)
+        self.fmin = fmin
+        self.fmax = fmax
+        self.n_pts = n_pts
+        self.settling_time = settling_time
+        self.NPeriods = NPeriods
 
+    def set_fmin(self, f):
+        self.set_parameters(fmin=f)
 
-def TemporalSingleFrequency(BS,amp,Freq,Phase = 0,Symmetry = 50,Nperiod=1,Delay = 0):
+    def set_fmax(self, f):
+        self.set_parameters(fmax=f)
 
-    GAIN = 1	
-    amp_stim= amp								#need to be changed with calibrated or uncalibrated gain
-    Gain_TIA = 100								#need to be changed with calibrated or uncalibrated gain
-    amp_AWG =  amp_stim*GAIN 					#need to be changed with calibrated or uncalibrated gain
-    AWG_offset = 0.02 								#in calibration
+    def set_n_pts(self, N):
+        self.set_parameters(n_pts=N)
 
-    AD2_VRO_range = 5.0							#in calibration
-    AD2_VRO_offset = 0.0
-    AD2_IRO_range = 5.0
-    AD2_IRO_offset = 0.0
-    
-    # set the generators
-    BS.AWG_sine(freq=Freq, amp=amp_AWG,activate = False,offset = AWG_offset, phase = Phase,
-                        symmetry = Symmetry)
+    def set_settling_time(self, t):
+        self.set_parameters(settling_time=t)
 
-    Fs_max = BS.AD2_input_Fs_max
-    Npts = BS.AD2_input_buffer_size
-    fs = Freq*Npts/Nperiod
+    def set_NPeriods(self, N):
+        self.set_parameters(NPeriods=N)
 
-    while (fs>Fs_max):
-        Npts-=1
-        fs = Freq*Npts/Nperiod
+    def measure(self, BS: BIMMScalibration):
+        BS.ad2.configure_network_analyser()	#need to be checked
+        freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(
+            self.fmin,
+            self.fmax,
+            n_points=self.n_pts,
+            dB=False,
+            offset=BS.awg_offset,
+            deg=True,
+            amp=BS.awg_amp,
+            settling_time=self.settling_time,
+            Nperiods=self.NPeriods,
+            verbose=BS.verbose,
+        )
 
-    BS.Set_AWG_trigger(delay=Delay)
-    t = BS.set_acquistion(fs, Npts)
-
-    BS.AWG_enable(True)
-    chan1, chan2 = BS.get_input_data()
-    
-    BS.AWG_enable(False)
-
-    #Here --> convert chan1, chan2 with calibration data
-
-    return(t,chan1,chan2)
-    #pass
-
-
-"""
+        gain_ch2 = gain_ch1/gain_mes
+        results = {'freq':freq, 'mag_ch1':gain_ch1,'mag_ch2':gain_ch2, 'phase':phase_mes}

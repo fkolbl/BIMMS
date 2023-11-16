@@ -49,13 +49,13 @@ class BIMMS(BIMMScalibration):
         self.measures += [m]
 
 
-    def callibrate(self):
+    def calibrate(self):
         pass
 
     def check_measures_config():
         pass
 
-    def measure(self):
+    def measure(self,clear_mstack = True):
         self.check_config()
         self.set_config()
         self.get_awg_parameters()
@@ -73,6 +73,8 @@ class BIMMS(BIMMScalibration):
                     "measure": m.save()
                 }
                 self.results[m.ID].update(m.measure(self))
+        if (clear_mstack):
+            self.measures = []
         return self.results
 
     def check_config(self):

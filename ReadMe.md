@@ -28,7 +28,6 @@ for the third party softwares, please visit:
     - Add selftests capabilities 
     - Add measurement methods/class --> skeleton OK 
     - Add calibration routines --> skeleton OK 
-    - Double check excitation/readout signaling 
     - Comments
     - add verbosity mode
     - do "standard configuration" 
@@ -36,3 +35,8 @@ for the third party softwares, please visit:
     - change HIGH/LOW GAIN 
     - Test multiple measurements in a row
     - results class
+    - offset compensation in scope input
+
+# HARDWARE TEST TODO:
+    - Double check excitation/readout signaling 
+    - test connect_TIA_to_CH2, disconnect_TIA_from_CH2, disable_current_source, enable_potentiostat

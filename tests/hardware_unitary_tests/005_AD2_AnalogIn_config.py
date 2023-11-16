@@ -14,7 +14,6 @@ BS.config.G_EIS_gain = "LOW"
 BS.config.IRO_gain = 1
 BS.config.VRO_gain = 1
 BS.config.DC_feedback = False
-BS.set_config()
 
 #Decimate mode:
 BS.AD2_set_input_range(-1,2.0)

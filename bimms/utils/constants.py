@@ -153,3 +153,7 @@ A2uA = 1e-6
 
 
 
+#AD2 constants: 
+min_AWG_amp = 0.0
+max_AWG_amp = 5.0
+defaumt_AWG_amp = 0.1

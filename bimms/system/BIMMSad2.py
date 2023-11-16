@@ -176,7 +176,7 @@ class BIMMSad2(BIMMS_class):
     ## AD2 Analog OUT ##
     ####################
 
-    def AWG_sine(self,freq, amp ,offset, phase ,symmetry,activate = False):
+    def AWG_sine(self,freq, amp ,offset=0, phase=0 ,symmetry=50,activate = False):
         self.ad2.sine(channel=cst.AD2_AWG_ch, freq=freq, amp=amp,activate = False,offset = offset, phase = phase,
                         symmetry = symmetry)
         
@@ -196,5 +196,6 @@ class BIMMSad2(BIMMS_class):
         self.ad2.set_AWG_trigger(cst.AD2_AWG_ch,type="Rising",ref="left border", position=delay)
     
     
+    def Set_AUTO_trigger(self,timeout=0.1, type="Rising", ref="center"):
+        self.ad2.set_Auto_chan_trigger(0, timeout=0.1, type="Rising", ref="center")
 
-    
