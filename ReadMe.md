@@ -40,3 +40,5 @@ for the third party softwares, please visit:
 # HARDWARE TEST TODO:
     - Double check excitation/readout signaling 
     - test connect_TIA_to_CH2, disconnect_TIA_from_CH2, disable_current_source, enable_potentiostat
+    - test dc feedback
+    - Offset values are odds (measure seems ok tho)

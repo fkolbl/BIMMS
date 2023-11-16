@@ -1,163 +1,339 @@
 import bimms as bm
 import numpy as np
+import matplotlib.pyplot as plt
 
 print('======== Current source test ========')
 print('Connect a 1k resistor between STIM+ and STIM-')
 input('- Press a Key when ready')
 
+test_offset = False
+test_single_freq = False
+test_bode = True
+
 BS = bm.BIMMS()
-BS.config.excitation_sources("INTERNAL")
-BS.config.excitation_mode("G_EIS")
-BS.config.wire_mode("2_WIRE")
-BS.config.readout_coupling("DC")
-BS.config.recording_mode("V")
-BS.config.recording_signaling_mode("AUTO")
+BS.config_mode("TEST")
 
-BS.config.G_EIS_gain = "LOW"
-BS.config.IRO_gain = 1
-BS.config.VRO_gain = 1
-BS.config.DC_feedback = False
+BS.test_config.waveform_gen("INTERNAL")
+BS.test_config.excitation_source("CURRENT")
+BS.test_config.I_source_gain("LOW")
+BS.test_config.wire_mode("2_WIRE")
+BS.test_config.excitation_signaling_mode("SE")
+BS.test_config.excitation_coupling("DC")
+BS.test_config.DC_feedback(False)
+BS.test_config.Enable_Isource(True)
+
+BS.test_config.CHx_to_Scopex("CH1")
+BS.test_config.CH1_coupling("DC")
+BS.test_config.CH2_coupling("DC")
+BS.test_config.TIA_coupling("DC")
+BS.test_config.TIA_to_CH2(False)
+BS.test_config.TIA_NEG("GND")
+BS.test_config.CH1_gain(1)
+BS.test_config.CH2_gain(1)
+
+Rload = 1000
+
+def v_2_uA (val):
+	return(1e6*val/Rload)
 
 
-#MEASURE OFFSET CH1
+#offset measure 
 acqu_duration = 1.0
 max_offset = 1.0
+N_avg = 2
 
-print("Test offset current source ...")
-BS.config.excitation_signaling_mode("SE")
-BS.config.excitation_coupling("DC")
-BS.set_config()
-offset_DC = bm.Measure_Offset(BS = BS,channel = 1)
-print("Measured G_EIS DC-SE offset: " +str(np.round(offset_DC,6)) +'V')
-if (np.abs(offset_DC)>max_offset):
-	BS.close()
-	raise ValueError('Excessive offset value on current source')
+#single frequency measure
+freq = 1e3
+n_period = 5
+amp_AWG = 0.1
+BS.test_config.AWG_amp(amp_AWG)
 
-BS.config.excitation_coupling("AC")
-BS.set_config()
-offset_DC = bm.Measure_Offset(BS = BS,channel = 1)
-print("Measured G_EIS AC-SE offset: " +str(np.round(offset_DC,6)) +'V')
-if (np.abs(offset_DC)>max_offset):
-	BS.close()
-	raise ValueError('Excessive offset value in measured on current source')
+#bode 
+fmin = 1e3
+fmax = 1e6
+n_pts=101
+settling_time=0.001
+NPeriods=8
 
-BS.config.excitation_signaling_mode("DIFF")
-BS.config.excitation_coupling("DC")
-BS.set_config()
-offset_DC = bm.Measure_Offset(BS = BS,channel = 1)
-print("Measured G_EIS DC-DIFF offset: " +str(np.round(offset_DC,6)) +'V')
-if (np.abs(offset_DC)>max_offset):
-	BS.close()
-	raise ValueError('Excessive offset value in measured on current source')
+if (test_offset):
+	print("===== Offset Current Source - LG-SE-DC Coupling =====")
+	BS.test_config.I_source_gain("LOW")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.Offset(acqu_duration,N_avg)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	offset_ch1 = np.round(results['ch1_offset']*1000,3)
+	print("Offset: "+str(v_2_uA(offset_ch1))+"µA")
 
-BS.config.excitation_coupling("AC")
-BS.set_config()
-offset_DC = bm.Measure_Offset(BS = BS,channel = 1)
-print("Measured G_EIS AC-DIFF offset: " +str(np.round(offset_DC,6)) +'V')
-if (np.abs(offset_DC)>max_offset):
-	BS.close()
-	raise ValueError('Excessive offset value in measured on current source')
+	print("===== Offset Current Source - LG-SE-AC Coupling =====")
+	BS.test_config.I_source_gain("LOW")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.Offset(acqu_duration,N_avg)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	offset_ch1 = np.round(results['ch1_offset']*1000,3)
+	print("Offset: "+str(v_2_uA(offset_ch1))+"µA")
 
-BS.G_EIS_gain = "HIGH"
-BS.config.excitation_coupling("DC")
-BS.set_config()
-offset_DC = bm.Measure_Offset(BS = BS,channel = 1)
-print("Measured G_EIS DC-DIFF (High-Gain) offset: " +str(np.round(offset_DC,6)) +'V')
-if (np.abs(offset_DC)>max_offset):
-	BS.close()
-	raise ValueError('Excessive offset value in measured on current source')
+	print("===== Offset Current Source - LG-DIFF-DC Coupling =====")
+	BS.test_config.I_source_gain("LOW")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.Offset(acqu_duration,N_avg)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	offset_ch1 = np.round(results['ch1_offset']*1000,3)
+	print("Offset: "+str(v_2_uA(offset_ch1))+"µA")
 
-BS.G_EIS_gain = "HIGH"
-BS.config.excitation_coupling("AC")
-BS.set_config()
-offset_DC = bm.Measure_Offset(BS = BS,channel = 1)
-print("Measured G_EIS AC-DIFF (High-Gain) offset: " +str(np.round(offset_DC,6)) +'V')
-if (np.abs(offset_DC)>max_offset):
-	BS.close()
-	raise ValueError('Excessive offset value in measured on current source')
+	print("===== Offset Current Source - LG-DIFF-AC Coupling =====")
+	BS.test_config.I_source_gain("LOW")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.Offset(acqu_duration,N_avg)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	offset_ch1 = np.round(results['ch1_offset']*1000,3)
+	print("Offset: "+str(v_2_uA(offset_ch1))+"µA")
 
-BS.G_EIS_gain = "HIGH"
-BS.config.excitation_coupling("AC")
-BS.set_config()
-offset_DC = bm.Measure_Offset(BS = BS,channel = 1)
-print("Measured G_EIS AC-DIFF (High-Gain, DC Feedback ON) offset: " +str(np.round(offset_DC,6)) +'V')
-if (np.abs(offset_DC)>max_offset):
-	BS.close()
-	raise ValueError('Excessive offset value in measured on current source')
+	print("===== Offset Current Source - HG-SE-DC Coupling =====")
+	BS.test_config.I_source_gain("HIGH")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.Offset(acqu_duration,N_avg)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	offset_ch1 = np.round(results['ch1_offset']*1000,3)
+	print("Offset: "+str(v_2_uA(offset_ch1))+"µA")
 
-BS.config.DC_feedback  = True
-BS.config.excitation_signaling_mode = "SE"
-BS.set_config()
-offset_DC = bm.Measure_Offset(BS = BS,channel = 1)
-print("Measured G_EIS AC-SE (High-Gain, DC Feedback ON) offset: " +str(np.round(offset_DC,6)) +'V')
-if (np.abs(offset_DC)>max_offset):
-	BS.close()
-	raise ValueError('Excessive offset value in measured on current source')
-print("DONE!")
+	print("===== Offset Current Source - HG-SE-AC Coupling =====")
+	BS.test_config.I_source_gain("HIGH")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.Offset(acqu_duration,N_avg)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	offset_ch1 = np.round(results['ch1_offset']*1000,3)
+	print("Offset: "+str(v_2_uA(offset_ch1))+"µA")
 
-print("Test gain current source ...")
-################
-## Parameters ##
-################
-amp = 1
-fmin = 100
-fmax = 10e3
-offset = 0
-n_pts = 20
-settling_time = 0.01
-NPeriods = 16
-high_gain_min = 50000
-high_gain_max = 1000
-low_gain_min = 94000
-low_gain_max = 47000
-load = 1000
-tolerance = 10 #10% tolerance on measured gain
+	print("===== Offset Current Source - HG-DIFF-DC Coupling =====")
+	BS.test_config.I_source_gain("HIGH")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.Offset(acqu_duration,N_avg)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	offset_ch1 = np.round(results['ch1_offset']*1000,3)
+	print("Offset: "+str(v_2_uA(offset_ch1))+"µA")
 
-BS.config.DC_feedback  = False
-BS.config.excitation_signaling_mode = "SE"
-BS.G_EIS_gain = "LOW"
-BS.config.excitation_coupling("DC")
-BS.set_config()
-
-BS.ad2.configure_network_analyser()
-vrange = round(amp,2)
-freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
-mean_gain = np.mean(gain_ch1)
-mean_current = mean_gain/load
-max_current = amp * 2.2/low_gain_max
-max_current = max_current*(1+tolerance/100)		#include tolerance
-min_current = amp * 2.2/low_gain_min
-min_current = min_current*(1-tolerance/100)		#include tolerance
-print("Measured G_EIS DC-SE (LOW-Gain, DC Feedback OFF) GAIN: " +str(np.round(mean_gain,6)) +'A/V')
-if (mean_current>max_current):
-	BS.close()
-	raise ValueError('ERROR: Failed to measure expected gain on current source')
-if (mean_current<min_current):
-	BS.close()
-	raise ValueError('ERROR: Failed to measure expected gain on current source')
+	print("===== Offset Current Source - HG-DIFF-AC Coupling =====")
+	BS.test_config.I_source_gain("HIGH")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.Offset(acqu_duration,N_avg)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	offset_ch1 = np.round(results['ch1_offset']*1000,3)
+	print("Offset: "+str(v_2_uA(offset_ch1))+"µA")
 
 
-BS.G_EIS_gain = "HIGH"
-BS.set_config()
-BS.ad2.configure_network_analyser()
-vrange = round(amp,2)
-freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
-mean_gain = np.mean(gain_ch1)
-mean_current = mean_gain/load
-max_current = amp * 2.2/high_gain_max
-max_current = max_current*(1+tolerance/100)		#include tolerance
-min_current = amp * 2.2/high_gain_min
-min_current = min_current*(1-tolerance/100)		#include tolerance
-print("Measured G_EIS DC-SE (HIGH-Gain, DC Feedback OFF) GAIN: " +str(np.round(mean_gain,6)) +'A/V')
-if (mean_current>max_current):
-	BS.close()
-	raise ValueError('ERROR: Failed to measure expected gain on current source')
-if (mean_current<min_current):
-	BS.close()
-	raise ValueError('ERROR: Failed to measure expected gain on current source')
-print("DONE!")
+if (test_single_freq):
+	plt.figure()
+	print("===== Single Frequency - LG-SE-DC Coupling =====")
+	BS.test_config.I_source_gain("LOW")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.TemporalSingleFrequency(freq = freq,Nperiod = n_period)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	ch1 = v_2_uA(results['chan1'])
+	t = results['t']
+	plt.plot(t,ch1, label = "LG-SE-DC")
+
+	print("===== Single Frequency - LG-SE-AC Coupling =====")
+	BS.test_config.I_source_gain("LOW")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.TemporalSingleFrequency(freq = freq,Nperiod = n_period)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	ch1 = v_2_uA(results['chan1'])
+	t = results['t']
+	plt.plot(t,ch1, label = "LG-SE-AC")
+
+	print("===== Single Frequency - LG-DIFF-DC Coupling =====")
+	BS.test_config.I_source_gain("LOW")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.TemporalSingleFrequency(freq = freq,Nperiod = n_period)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	ch1 = v_2_uA(results['chan1'])
+	t = results['t']
+	plt.plot(t,ch1, label = "LG-DIFF-DC")
+
+	print("===== Single Frequency - LG-DIFF-AC Coupling =====")
+	BS.test_config.I_source_gain("LOW")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.TemporalSingleFrequency(freq = freq,Nperiod = n_period)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	ch1 = v_2_uA(results['chan1'])
+	t = results['t']
+	plt.plot(t,ch1, label = "LG-DIFF-DC")
+
+	print("===== Single Frequency - HG-SE-DC Coupling =====")
+	BS.test_config.I_source_gain("HIGH")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.TemporalSingleFrequency(freq = freq,Nperiod = n_period)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	ch1 = v_2_uA(results['chan1'])
+	t = results['t']
+	plt.plot(t,ch1, label = "HG-SE-DC")
+
+	print("===== Single Frequency - HG-SE-AC Coupling =====")
+	BS.test_config.I_source_gain("HIGH")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.TemporalSingleFrequency(freq = freq,Nperiod = n_period)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	ch1 = v_2_uA(results['chan1'])
+	t = results['t']
+	plt.plot(t,ch1, label = "HG-SE-AC")
+
+	print("===== Single Frequency - HG-DIFF-DC Coupling =====")
+	BS.test_config.I_source_gain("HIGH")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.TemporalSingleFrequency(freq = freq,Nperiod = n_period)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	ch1 = v_2_uA(results['chan1'])
+	t = results['t']
+	plt.plot(t,ch1, label = "HG-DIFF-DC")
+
+	print("===== Single Frequency - HG-DIFF-AC Coupling =====")
+	BS.test_config.I_source_gain("HIGH")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.TemporalSingleFrequency(freq = freq,Nperiod = n_period)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	ch1 = v_2_uA(results['chan1'])
+	t = results['t']
+	plt.plot(t,ch1, label = "HG-DIFF-AC")
+
+
+if (test_bode):
+	plt.figure()
+	print("===== Bode - LG-SE-DC Coupling =====")
+	BS.test_config.I_source_gain("LOW")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	mag_ch1 = results['mag_ch1']
+	freq = results['freq']
+	plt.semilogx(freq,mag_ch1, label = "SE-DC")
+	mes_gain = mag_ch1[0]
+	print("Current Source Gain: "+ str(np.round(v_2_uA(mes_gain),3))+ 'uA/V')
+
+	print("===== Bode - LG-SE-DC Coupling =====")
+	BS.test_config.I_source_gain("LOW")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	mag_ch1 = results['mag_ch1']
+	freq = results['freq']
+	plt.semilogx(freq,mag_ch1, label = "SE-DC")
+	mes_gain = mag_ch1[0]
+	print("Current Source Gain: "+ str(np.round(v_2_uA(mes_gain),3))+ 'uA/V')
+
+	print("===== Bode - LG-SE-DC Coupling =====")
+	BS.test_config.I_source_gain("LOW")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	mag_ch1 = results['mag_ch1']
+	freq = results['freq']
+	plt.semilogx(freq,mag_ch1, label = "SE-DC")
+	mes_gain = mag_ch1[0]
+	print("Current Source Gain: "+ str(np.round(v_2_uA(mes_gain),3))+ 'uA/V')
+
+	print("===== Bode - LG-SE-DC Coupling =====")
+	BS.test_config.I_source_gain("LOW")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	mag_ch1 = results['mag_ch1']
+	freq = results['freq']
+	plt.semilogx(freq,mag_ch1, label = "SE-DC")
+	mes_gain = mag_ch1[0]
+	print("Current Source Gain: "+ str(np.round(v_2_uA(mes_gain),3))+ 'uA/V')
+
+	print("===== Bode - HG-SE-DC Coupling =====")
+	BS.test_config.I_source_gain("HIGH")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	mag_ch1 = results['mag_ch1']
+	freq = results['freq']
+	plt.semilogx(freq,mag_ch1, label = "SE-DC")
+	mes_gain = mag_ch1[0]
+	print("Current Source Gain: "+ str(np.round(v_2_uA(mes_gain),3))+ 'uA/V')
+
+	print("===== Bode - HG-SE-DC Coupling =====")
+	BS.test_config.I_source_gain("HIGH")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	mag_ch1 = results['mag_ch1']
+	freq = results['freq']
+	plt.semilogx(freq,mag_ch1, label = "SE-DC")
+	mes_gain = mag_ch1[0]
+	print("Current Source Gain: "+ str(np.round(v_2_uA(mes_gain),3))+ 'uA/V')
+
+	print("===== Bode - HG-SE-DC Coupling =====")
+	BS.test_config.I_source_gain("HIGH")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	mag_ch1 = results['mag_ch1']
+	freq = results['freq']
+	plt.semilogx(freq,mag_ch1, label = "SE-DC")
+	mes_gain = mag_ch1[0]
+	print("Current Source Gain: "+ str(np.round(v_2_uA(mes_gain),3))+ 'uA/V')
+
+	print("===== Bode - HG-SE-DC Coupling =====")
+	BS.test_config.I_source_gain("HIGH")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	mag_ch1 = results['mag_ch1']
+	freq = results['freq']
+	plt.semilogx(freq,mag_ch1, label = "SE-DC")
+	mes_gain = mag_ch1[0]
+	print("Current Source Gain: "+ str(np.round(v_2_uA(mes_gain),3))+ 'uA/V')
 
 
 
-BS.close()
-print("Current source sucessfully pass all tests.")
+	plt.show()
