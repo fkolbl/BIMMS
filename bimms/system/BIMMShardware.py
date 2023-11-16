@@ -30,7 +30,7 @@ from ..utils import constants as cst
 
 ### verbosity of the verbosity
 verbose = True
-
+HardwareVerbose = True
 
 ##############################
 ## CLASS FOR BIMMS HANDLING ##
@@ -210,139 +210,211 @@ class BIMMShardware(BIMMSad2):
 
     def connect_CH1_to_scope_1(self):
         self.Chan1Scope1 = 1
+        if (HardwareVerbose):
+            print("Hardware Info: CH1 connected to SCOPE1")
 
     def disconnect_CH1_from_scope_1(self):
         self.Chan1Scope1 = 0
+        if (HardwareVerbose):
+            print("Hardware Info: CH1 disconnected from SCOPE1")
 
     def connect_CH2_to_scope_2(self):
         self.Chan2Scope2 = 1
+        if (HardwareVerbose):
+            print("Hardware Info: CH2 connected to SCOPE1")
 
     def disconnect_CH2_from_scope_2(self):
         self.Chan2Scope2 = 0
+        if (HardwareVerbose):
+            print("Hardware Info: CH2 disconnected from SCOPE1")
 
     def set_CH1_AC_coupling(self):
         self.Ch1Coupling = 1
+        if (HardwareVerbose):
+            print("Hardware Info: CH1 AC Coupled")
 
     def set_CH1_DC_coupling(self):
         self.Ch1Coupling = 0
+        if (HardwareVerbose):
+            print("Hardware Info: CH1 DC Coupled")
 
     def set_CH2_AC_coupling(self):
         self.Ch2Coupling = 1
+        if (HardwareVerbose):
+            print("Hardware Info: CH2 AC Coupled")
 
     def set_CH2_DC_coupling(self):
         self.Ch2Coupling = 0
+        if (HardwareVerbose):
+            print("Hardware Info: CH2 DC Coupled")
 
     def connect_Vpos_to_StimPos(self):
         self.VoutPos2StimPos = 1
         self.Ipos2StimPos = 0
         self.Potentiostat2StimPos = 0
+        if (HardwareVerbose):
+            print("Hardware Info: Vpos connected to StimPos")
 
     def connect_Ipos_to_StimPos(self):
         self.VoutPos2StimPos = 0
         self.Ipos2StimPos = 1
         self.Potentiostat2StimPos = 0
+        if (HardwareVerbose):
+            print("Hardware Info: Ipos connected to StimPos")
 
     def connect_Potentiostat_to_StimPos(self):
         self.VoutPos2StimPos = 0
         self.Ipos2StimPos = 0
         self.Potentiostat2StimPos = 1
+        if (HardwareVerbose):
+            print("Hardware Info: Potentiostat connected to StimPos")
 
     def disconnect_StimPos(self):
         self.VoutPos2StimPos = 0
         self.Ipos2StimPos = 0
         self.Potentiostat2StimPos = 0
+        if (HardwareVerbose):
+            print("Hardware Info: StimPos disconnected")
 
     def connect_Ineg_to_StimNeg(self):
         self.Ineg2StimNeg = 1
         self.VoutNeg2StimNeg = 0
         self.TIA2StimNeg = 0
         self.GND2StimNeg = 0
+        if (HardwareVerbose):
+            print("Hardware Info: Ineg connected to StimNeg")
 
     def connect_Vneg_to_StimNeg(self):
         self.Ineg2StimNeg = 0
         self.VoutNeg2StimNeg = 1
         self.TIA2StimNeg = 0
         self.GND2StimNeg = 0
+        if (HardwareVerbose):
+            print("Hardware Info: Vneg connected to StimNeg")
 
     def connect_TIA_to_StimNeg(self):
         self.Ineg2StimNeg = 0
         self.VoutNeg2StimNeg = 0
         self.TIA2StimNeg = 1
         self.GND2StimNeg = 0
+        if (HardwareVerbose):
+            print("Hardware Info: TIA connected to StimNeg")
 
     def connect_GND_to_StimNeg(self):
         self.Ineg2StimNeg = 0
         self.VoutNeg2StimNeg = 0
         self.TIA2StimNeg = 0
         self.GND2StimNeg = 1
+        if (HardwareVerbose):
+            print("Hardware Info: GND connected to StimNeg")
 
     def disconnect_StimNeg(self):
         self.Ineg2StimNeg = 0
         self.VoutNeg2StimNeg = 0
         self.TIA2StimNeg = 0
         self.GND2StimNeg = 0
-
+        if (HardwareVerbose):
+            print("Hardware Info: StimNeg disconnected")
+    
     def enable_DC_feedback(self):
         self.DCFeedback = 1
+        if (HardwareVerbose):
+            print("Hardware Info: DC Feedback ON")
 
     def disable_DC_feedback(self):
         self.DCFeedback = 0
+        if (HardwareVerbose):
+            print("Hardware Info: DC Feedback OFF")
 
     def connect_external_AWG(self):
         self.InternalAWG = 1
+        if (HardwareVerbose):
+            print("Hardware Info: External AWG connected")
 
     def connect_internal_AWG(self):
         self.InternalAWG = 0
+        if (HardwareVerbose):
+            print("Hardware Info: Internal AWG connected")
 
     def connect_TIA_to_CH2(
         self,
     ):  # BUG !! Normalement = 0 pour disconnect mais 1 ici pour réparer bug Hardware
         self.TIA2Chan2 = 0
+        if (HardwareVerbose):
+            print("Hardware Info: TIA connected to CH2")
 
     def disconnect_TIA_from_CH2(self):  # Ne marche pas car BUG Hardware
         self.TIA2Chan2 = 1
+        if (HardwareVerbose):
+            print("Hardware Info: TIA disconnected from CH2")
 
     def connect_TIA_Neg_to_ground(self):
         self.TIANegIn1 = 0
         self.TIANegIn2 = 0
+        if (HardwareVerbose):
+            print("Hardware Info: TIA neg connected to GND")
 
     def connect_TIA_Neg_to_Vneg(self):
         self.TIANegIn1 = 1
         self.TIANegIn2 = 0
+        if (HardwareVerbose):
+            print("Hardware Info: TIA neg connected to Vneg")
 
     def connect_TIA_Neg_to_Ineg(self):
         self.TIANegIn1 = 1
         self.TIANegIn2 = 1
+        if (HardwareVerbose):
+            print("Hardware Info: TIA neg connected to Ineg")
 
     def set_TIA_AC_coupling(self):
         self.TIACoupling = 1
+        if (HardwareVerbose):
+            print("Hardware Info: TIA AC Coupled")
 
     def set_TIA_DC_coupling(self):
         self.TIACoupling = 0
+        if (HardwareVerbose):
+            print("Hardware Info: TIA DC Coupled")
 
     def enable_potentiostat(self):
         self.EnPotentiostat = 1
+        if (HardwareVerbose):
+            print("Hardware Info: Potentiostat EN")
 
     def disable_potentiostat(self):
         self.EnPotentiostat = 0
+        if (HardwareVerbose):
+            print("Hardware Info: Potentiostat OFF")
 
     def enable_current_source(self):
         self.EnCurrentSource = 0
+        if (HardwareVerbose):
+            print("Hardware Info: Current Source ON")
 
     def disable_current_source(self):  # Might not be usefull / bad for AD830
         self.EnCurrentSource = 1
+        if (HardwareVerbose):
+            print("Hardware Info: Current Source OFF")
 
     def set_high_gain_current_source(self):
         self.GainCurrentSource = 0
+        if (HardwareVerbose):
+            print("Hardware Info: Current Source High Gain")
 
     def set_low_gain_current_source(self):
         self.GainCurrentSource = 1
+        if (HardwareVerbose):
+            print("Hardware Info: Current Source Low Gain")
 
     def set_Stim_DC_coupling(self):
         self.StimCoupling = 1
+        if (HardwareVerbose):
+            print("Hardware Info: DC coupled Excitation")
 
     def set_Stim_AC_coupling(self):
         self.StimCoupling = 0
+        if (HardwareVerbose):
+            print("Hardware Info: AC coupled Excitation")
 
     def set_2_points_config(self):
         warn('This method is deprecated.', DeprecationWarning, stacklevel=2)
@@ -359,13 +431,20 @@ class BIMMShardware(BIMMSad2):
     def set_2_wires_mode(self):
         self.StimNeg2VNeg = 1
         self.StimPos2VPos = 1
+        if (HardwareVerbose):
+            print("Hardware Info: 2-wire output connected")
 
     def set_3_wires_mode(self):
         pass
+        print("Warning: 3-wire mode not implemented yet")
+        if (HardwareVerbose):
+            print("Hardware Info: 3-wire output connected")
 
     def set_4_wires_mode(self):
         self.StimNeg2VNeg = 0
         self.StimPos2VPos = 0
+        if (HardwareVerbose):
+            print("Hardware Info: 4-wire output connected")
 
     ##############################################
     ## AD2 Digital IO methods for gains control ##

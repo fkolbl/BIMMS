@@ -1,114 +1,189 @@
 import bimms as bm
 import numpy as np
+import matplotlib.pyplot as plt
 
 print('======== Voltage source test ========')
 print('Unplug any connected wire/load')
 input('- Press a Key when ready')
 
-BS = bm.BIMMS()
-BS.config.excitation_sources("INTERNAL")
-BS.config.excitation_mode("P_EIS")
-BS.config.wire_mode("2_WIRE")
-BS.config.readout_coupling("DC")
-BS.config.recording_mode("V")
-BS.config.recording_signaling_mode("AUTO")
+test_offset = True
+test_single_freq = True
+test_bode = True
 
-#MEASURE OFFSET CH1
-gain_IA = 1
+BS = bm.BIMMS()
+BS.config_mode("TEST")
+
+BS.test_config.waveform_gen("INTERNAL")
+BS.test_config.excitation_source("VOLTAGE")
+BS.test_config.I_source_gain("HIGH")
+BS.test_config.wire_mode("2_WIRE")
+BS.test_config.excitation_signaling_mode("SE")
+BS.test_config.excitation_coupling("DC")
+BS.test_config.DC_feedback(False)
+BS.test_config.Enable_Isource(True)
+
+BS.test_config.CHx_to_Scopex("CH1")
+BS.test_config.CH1_coupling("DC")
+BS.test_config.CH2_coupling("DC")
+BS.test_config.TIA_coupling("DC")
+BS.test_config.TIA_to_CH2(False)
+BS.test_config.TIA_NEG("GND")
+BS.test_config.CH1_gain(1)
+BS.test_config.CH2_gain(1)
+
+
+
+#offset measure 
 acqu_duration = 1.0
 max_offset = 1.0
+N_avg = 2
 
-BS.config.excitation_signaling_mode("SE")
-BS.config.excitation_coupling("DC")
-BS.set_config()
-print("Test offset voltage source ...")
-offset_DC = bm.Measure_Offset(BS = BS,channel = 1,Vrange = 1)
-print("Measured DC-SE offset: " +str(np.round(offset_DC,6)) +'V')
-if (np.abs(offset_DC)>max_offset):
-	BS.close()
-	raise ValueError('Excessive offset value in measured on voltage source')
+#single frequency measure
+freq = 1e3
+n_period = 5
+amp_AWG = 0.1
+BS.test_config.AWG_amp(amp_AWG)
+
+#bode 
+fmin = 1e3
+fmax = 1e6
+n_pts=101
+settling_time=0.001
+NPeriods=8
+
+if (test_offset):
+	print("===== Offset Voltage Source - SE-DC Coupling =====")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.Offset(acqu_duration,N_avg)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	offset_ch1 = np.round(results['ch1_offset']*1000,3)
+	print("Offset: "+str(offset_ch1)+"mV")
+
+	print("===== Offset Voltage Source - SE-AC Coupling =====")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.Offset(acqu_duration,N_avg)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	offset_ch1 = np.round(results['ch1_offset']*1000,3)
+	print("Offset: "+str(offset_ch1)+"mV")
+
+	print("===== Offset Voltage Source - DIFF-DC Coupling =====")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.Offset(acqu_duration,N_avg)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	offset_ch1 = np.round(results['ch1_offset']*1000,3)
+	print("Offset: "+str(offset_ch1)+"mV")
+
+	print("===== Offset Voltage Source - DIFF-AC Coupling =====")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.Offset(acqu_duration,N_avg)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	offset_ch1 = np.round(results['ch1_offset']*1000,3)
+	print("Offset: "+str(offset_ch1)+"mV")
 
 
-BS.config.excitation_signaling_mode("SE")
-BS.config.excitation_coupling("AC")
-BS.set_config()
-offset_DC = bm.Measure_Offset(BS = BS,channel = 1,Vrange = 1)
-print("Measured AC-SE offset: " +str(np.round(offset_DC,6)) +'V')
-if (np.abs(offset_DC)>max_offset):
-	BS.close()
-	raise ValueError('Excessive offset value in measured on voltage source')
+if (test_single_freq):
+	plt.figure()
+	print("===== Single Frequency - SE-DC Coupling =====")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.TemporalSingleFrequency(freq = freq,Nperiod = n_period)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	ch1 = results['chan1']
+	t = results['t']
+	plt.plot(t,ch1, label = "SE-DC")
 
-BS.config.excitation_signaling_mode("DIFF")
-BS.config.excitation_coupling("DC")
-BS.set_config()
-offset_DC = bm.Measure_Offset(BS = BS,channel = 1,Vrange = 1)
-print("Measured DC-DIFF offset: " +str(np.round(offset_DC,6)) +'V')
-if (np.abs(offset_DC)>max_offset):
-	BS.close()
-	raise ValueError('Excessive offset value in measured on voltage source')
+	print("===== Single Frequency - SE-AC Coupling =====")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.TemporalSingleFrequency(freq = freq,Nperiod = n_period)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	ch1 = results['chan1']
+	t = results['t']
+	plt.plot(t,ch1, label = "SE-AC")
+
+	print("===== Single Frequency - DIFF-DC Coupling =====")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.TemporalSingleFrequency(freq = freq,Nperiod = n_period)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	ch1 = results['chan1']
+	t = results['t']
+	plt.plot(t,ch1, label = "DIFF-DC")
+
+	print("===== Single Frequency - DIFF-AC Coupling =====")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.TemporalSingleFrequency(freq = freq,Nperiod = n_period)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	ch1 = results['chan1']
+	t = results['t']
+	plt.plot(t,ch1, label = "DIFF-AC")
+
+	plt.legend()
+
+if (test_bode):
+	plt.figure()
+	print("===== Bode - SE-DC Coupling =====")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	mag_ch1 = results['mag_ch1']
+	freq = results['freq']
+	plt.semilogx(freq,mag_ch1, label = "SE-DC")
+	mes_gain = mag_ch1[0]
+	print("Voltage Source Gain: "+ str(np.round(mes_gain,3))+ 'V/V')
+
+	print("===== Bode - SE-AC Coupling =====")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("SE")
+	m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	mag_ch1 = results['mag_ch1']
+	freq = results['freq']
+	plt.semilogx(freq,mag_ch1, label = "SE-AC")
+	mes_gain = mag_ch1[0]
+	print("Voltage Source Gain: "+ str(np.round(mes_gain,3))+ 'V/V')
+
+	print("===== Bode - DIFF-DC Coupling =====")
+	BS.test_config.excitation_coupling("DC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	mag_ch1 = results['mag_ch1']
+	freq = results['freq']
+	plt.semilogx(freq,mag_ch1, label = "DIFF-DC")
+	mes_gain = mag_ch1[0]
+	print("Voltage Source Gain: "+ str(np.round(mes_gain,3))+ 'V/V')
+
+	print("===== Bode - DIFF-AC Coupling =====")
+	BS.test_config.excitation_coupling("AC")
+	BS.test_config.excitation_signaling_mode("DIFF")
+	m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+	BS.attach_measure(m1)
+	results = BS.measure()
+	mag_ch1 = results['mag_ch1']
+	freq = results['freq']
+	plt.semilogx(freq,mag_ch1, label = "DIFF-AC")
+	mes_gain = mag_ch1[0]
+	print("Voltage Source Gain: "+ str(np.round(mes_gain,3))+ 'V/V')
 
 
-BS.config.excitation_signaling_mode("DIFF")
-BS.config.excitation_coupling("AC")
-BS.set_config()
-offset_DC = bm.Measure_Offset(BS = BS,channel = 1,Vrange = 1)
-print("Measured AC-DIFF offset: " +str(np.round(offset_DC,6)) +'V')
-if (np.abs(offset_DC)>max_offset):
-	BS.close()
-	raise ValueError('Excessive offset value in measured on voltage source')
+	plt.legend()
 
-print("DONE!")
-
-print("Test gain voltage source ...")
-################
-## Parameters ##
-################
-amp = 1
-fmin = 100
-fmax = 100e3
-offset = 0
-n_pts = 20
-settling_time = 0.01
-NPeriods = 16
-tolerance = 5 #5% tolerance on measured gain
-gain_SE = 1.1
-gain_DIFF = 2.2
-gain_IA = 1
-####################################################
-
-BS.config.excitation_sources("INTERNAL")
-BS.config.excitation_mode("P_EIS")
-BS.config.wire_mode("2_WIRE")
-BS.config.readout_coupling("DC")
-BS.config.recording_mode("V")
-BS.config.recording_signaling_mode("AUTO")
-BS.config.excitation_signaling_mode("SE")
-BS.config.excitation_coupling("DC")
-BS.set_config()
-
-BS.ad2.configure_network_analyser()
-vrange = round(amp  * gain_SE*1.5,2)
-freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
-mean_gain = np.mean(gain_ch1)
-error = 100*np.abs(mean_gain-gain_SE)/gain_SE
-print("Measured SE GAIN: " +str(np.round(mean_gain,6)) +'V/V')
-if (error>tolerance):
-	BS.close()
-	raise ValueError('ERROR: Failed to measure expected gain on voltage source')
-
-BS.config.excitation_signaling_mode("DIFF")
-BS.set_config()
-BS.ad2.configure_network_analyser()
-vrange = round(amp  * gain_DIFF*1.5,2)
-freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(fmin, fmax, n_points = n_pts, dB = False,offset=offset, deg = True, amp = amp,settling_time=settling_time, Nperiods = NPeriods, Vrange_CH1 = vrange)
-mean_gain = np.mean(gain_ch1)
-error = 100*np.abs(mean_gain-gain_DIFF)/gain_SE
-print("Measured Diff GAIN: " +str(np.round(mean_gain,6)) +'V/V')
-if (error>tolerance):
-	BS.close()
-	raise ValueError('ERROR: Failed to measure expected gain on voltage source')
-
-BS.close()
-
-print("DONE!")
-print("Voltage source sucessfully pass all tests.")
+plt.show()

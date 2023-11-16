@@ -298,23 +298,24 @@ class BIMMSconfig(BIMMShardware):
         else:
             self.connect_external_AWG()
 
-        self.set_excitation_source()
+        self.set_test_excitation_source()
         if (self.test_config.excitation_coupling == "DC"):
             self.set_Stim_DC_coupling()
         else:
             self.set_Stim_AC_coupling()
         
-        if (self.test_config.DC_feedback):
+        if self.config.DC_feedback == True:
             self.enable_DC_feedback()
-        else:
+        else:   # False
             self.disable_DC_feedback()
         
-        if (self.test_config.Enable_Isource):
+        if (self.test_config.Enable_Isource== True):
             self.enable_current_source()
         else:
             self.disable_current_source()
+    
 
-    def set_excitation_source(self):
+    def set_test_excitation_source(self):
         if (self.test_config.excitation_source == "NONE"):
             self.disconnect_StimNeg()
             self.disconnect_StimPos()

@@ -58,6 +58,7 @@ class BIMMS(BIMMScalibration):
     def measure(self,clear_mstack = True):
         self.check_config()
         self.set_config()
+        sleep(0.1)
         self.get_awg_parameters()
         if len(self.measures) == 1:
             m = self.measures[0]
