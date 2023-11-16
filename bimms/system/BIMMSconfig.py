@@ -86,11 +86,10 @@ class BIMMSconfig(BIMMShardware):
         self.test_config.add_mode("CH2_coupling", config_mode("AC", "DC", default="DC"))
         self.test_config.add_mode("TIA_coupling", config_mode("AC", "DC", default="DC"))
         self.test_config.add_mode("TIA_to_CH2", config_mode(True, False, default=False))
+        self.test_config.add_mode("connect_TIA", config_mode(True, False, default=False))
         self.test_config.add_mode("TIA_NEG", config_mode("GND" ,"Vneg","Ineg", default="GND"))
         self.test_config.add_mode("CH1_gain", config_mode(*cst.gain_array.tolist(), default=1))
         self.test_config.add_mode("CH2_gain", config_mode(*cst.gain_array.tolist(), default=1))
-
-
 
     ####################
     ## Save and load  ##
@@ -347,7 +346,10 @@ class BIMMSconfig(BIMMShardware):
         self.connect_TIA()
 
     def connect_TIA(self):
-        if (self.test_config.TIA_to_CH2):
+        if (self.test_config.connect_TIA):
+            self.connect_TIA_to_StimNeg()
+
+        if (self.test_config.TIA_to_CH2==True):
             self.connect_TIA_to_CH2()
         else:
             self.disconnect_TIA_from_CH2()
@@ -356,7 +358,7 @@ class BIMMSconfig(BIMMShardware):
             self.connect_TIA_Neg_to_ground()
 
         elif (self.test_config.TIA_NEG == "Vneg"):
-            self.connect_TIA_Neg_to_Vneg
+            self.connect_TIA_Neg_to_Vneg()
         
         else:
              self.connect_TIA_Neg_to_Ineg

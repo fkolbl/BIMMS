@@ -25,6 +25,7 @@ BS.test_config.Enable_Isource(True)
 BS.test_config.CHx_to_Scopex("NONE")
 BS.test_config.CH1_coupling("DC")
 BS.test_config.CH2_coupling("DC")
+BS.test_config.connect_TIA(True)
 BS.test_config.TIA_coupling("DC")
 BS.test_config.TIA_to_CH2(False)
 BS.test_config.TIA_NEG("GND")
@@ -179,7 +180,6 @@ if (test_ch2):
     
 
     if (test_single_freq):
-        BS.test_config.AWG_amp(amp_AWG)
         plt.figure()
         print("===== Single Frequency CH2 - DC Coupling =====")
         for gain in bm.BIMMScst.gain_array:
@@ -210,7 +210,6 @@ if (test_ch2):
     
 
     if (test_bode):
-        BS.test_config.AWG_amp(amp_AWG)
         plt.figure()
         print("===== Bode CH2 - DC Coupling =====")
         for gain in bm.BIMMScst.gain_array:
@@ -228,7 +227,6 @@ if (test_ch2):
         plt.legend(title = 'CH2 Gain:')
 
     if (test_bode):
-        BS.test_config.AWG_amp(amp_AWG)
         plt.figure()
         print("===== Bode CH2 - AC Coupling =====")
         for gain in bm.BIMMScst.gain_array:
