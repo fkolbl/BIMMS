@@ -217,3 +217,4 @@ class Bode(Measure):
 
         gain_ch2 = gain_ch1/gain_mes
         results = {'freq':freq, 'mag_ch1':gain_ch1,'mag_ch2':gain_ch2, 'phase':phase_mes}
+        return(results)
