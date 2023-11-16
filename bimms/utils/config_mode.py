@@ -27,12 +27,17 @@ def is_float_str(string):
         return False
     except Exception as error:
         print("WARING: is_float_str: an exception occurred:", error)
+    except Exception as error:
+        print("WARING: is_float_str: an exception occurred:", error)
 
 def is_int_str(string):
     try:
         return int(string) != float(string)
     except ValueError:
         return False
+    except Exception as error:
+    # handle the exception
+        print("WARING: is_int_str: an exception occurred:", error)
     except Exception as error:
     # handle the exception
         print("WARING: is_int_str: an exception occurred:", error)
