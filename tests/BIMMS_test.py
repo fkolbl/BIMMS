@@ -27,7 +27,7 @@ all_tests.reverse()
 unit_test_results = './unitary_tests/figures/'
 digits = [str(k) for k in range(10)]
 all_tests [:] = (value for value in all_tests if value[0] in digits)
-all_tests.reverse()
+
 
 ###################################
 ## clean the test/figures folder ##

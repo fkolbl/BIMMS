@@ -85,22 +85,23 @@ class BIMMS_class(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self,fixed_attr=True):
         """
         Init method for BIMMS class
         """
         self.__BIMMSObject__ = True
         self.verbose = True
         self.bimms_type = self.__class__.__name__
+        self.__fixed_attr = fixed_attr
         if debug:
-            print("DEBUG: ",self.bimms_type, " initialized")
+            print("DEBUG: ", self.bimms_type, " initialized")
 
     def __del__(self):
         """
         Destructor for BIMMS class
         """
         if debug:
-            print("DEBUG: ",self.bimms_type, " deleted")
+            print("DEBUG: ", self.bimms_type, " deleted")
 
     def save(self, save=False, fname="bimms_save.json", blacklist=[], **kwargs):
         """
@@ -153,6 +154,10 @@ class BIMMS_class(metaclass=ABCMeta):
             key_dic = json_load(data)
         else:
             key_dic = data
+        if not self.__fixed_attr:
+            for key in key_dic:
+                if  key not in self.__dict__ and key not in blacklist:
+                    self.__dict__[key] = None
         for key in self.__dict__:
             if key in key_dic and key not in blacklist:
                 if is_BIMMS_object_dict(key_dic[key]):

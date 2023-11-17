@@ -44,7 +44,8 @@ def is_int_str(string):
 
 class config_mode(BIMMS_class):
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        super().__init__(fixed_attr=False)
+
         self.modes = []
         self.value = None
         for a in args:
@@ -154,30 +155,9 @@ class config_range(config_mode):
 
 class config_mode_list(BIMMS_class):
     def __init__(self, data=None):
-        super().__init__()
+        super().__init__(fixed_attr=False)
         self.list = []
         self.N_list = 0
-
-    def load(self, data, blacklist={}, **kwargs):
-        """
-        Loading method for config_mode_list
-
-        Parameters
-        ----------
-        data : dict
-            Dictionary containing the BIMMS object
-        blacklist : dict, optional
-            Dictionary containing the keys to be excluded from the load
-        **kwargs : dict, optional
-            Additional arguments to be passed to the load method of the BIMMS object
-        """
-        if isinstance(data, str):
-            key_dic = json_load(data)
-        else:
-            key_dic = data
-        for c in key_dic['list']:
-            self.__dict__[c] = None
-        super().load(key_dic, blacklist, **kwargs)
 
 
     def add_mode(self, name, mode):
