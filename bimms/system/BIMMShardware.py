@@ -490,11 +490,9 @@ class BIMMShardware(BIMMSad2):
         self.ad2.digitalIO_output(OUTPUT_vector)
 
     def set_gain_ch1_1(self, value):
-        if (
-            (value != 1) and (value != 2) and (value != 5) and (value != 10)
-        ):  # Invalid gain value
-            self.CH1_A0_0 = 0  # Gain is one
-            self.CH1_A1_0 = 0
+        if (value not in cst.gain_IA1):
+            print("WARNING: Invalid requested Gain for CH1_1")
+            value = 1
         if value == 1:
             self.CH1_A0_0 = 0
             self.CH1_A1_0 = 0
@@ -507,14 +505,14 @@ class BIMMShardware(BIMMSad2):
         if value == 10:
             self.CH1_A0_0 = 1
             self.CH1_A1_0 = 1
+        if (HardwareVerbose):
+            print("Hardware Info: CH1_1 Gain set to " +str(value))
         self.set_DIO_output()
 
     def set_gain_ch1_2(self, value):
-        if (
-            (value != 1) and (value != 2) and (value != 5) and (value != 10)
-        ):  # Invalid gain value
-            self.CH1_A0_1 = 0
-            self.CH1_A1_1 = 0  # Gain is one
+        if (value not in cst.gain_IA1):
+            print("WARNING: Invalid requested Gain for CH1_2")
+            value = 1
         if value == 1:
             self.CH1_A0_1 = 0
             self.CH1_A1_1 = 0
@@ -527,14 +525,14 @@ class BIMMShardware(BIMMSad2):
         if value == 10:
             self.CH1_A0_1 = 1
             self.CH1_A1_1 = 1
+        if (HardwareVerbose):
+            print("Hardware Info: CH1_2 Gain set to " +str(value))
         self.set_DIO_output()
 
     def set_gain_ch2_1(self, value):
-        if (
-            (value != 1) and (value != 2) and (value != 5) and (value != 10)
-        ):  # Invalid gain value
-            self.CH2_A0_0 = 0
-            self.CH2_A1_0 = 0  # Gain is one
+        if (value not in cst.gain_IA1):
+            print("WARNING: Invalid requested Gain for CH2_1")
+            value = 1
         if value == 1:
             self.CH2_A0_0 = 0
             self.CH2_A1_0 = 0
@@ -547,14 +545,14 @@ class BIMMShardware(BIMMSad2):
         if value == 10:
             self.CH2_A0_0 = 1
             self.CH2_A1_0 = 1
+        if (HardwareVerbose):
+            print("Hardware Info: CH2_1 Gain set to " +str(value))
         self.set_DIO_output()
 
     def set_gain_ch2_2(self, value):
-        if (
-            (value != 1) and (value != 2) and (value != 5) and (value != 10)
-        ):  # Invalid gain value
-            self.CH2_A0_1 = 0
-            self.CH2_A1_1 = 0  # Gain is one
+        if (value not in cst.gain_IA1):
+            print("WARNING: Invalid requested Gain for CH2_2")
+            value = 1
         if value == 1:
             self.CH2_A0_1 = 0
             self.CH2_A1_1 = 0
@@ -567,6 +565,8 @@ class BIMMShardware(BIMMSad2):
         if value == 10:
             self.CH2_A0_1 = 1
             self.CH2_A1_1 = 1
+        if (HardwareVerbose):
+            print("Hardware Info: CH2_2 Gain set to " +str(value))
         self.set_DIO_output()
 
     #################################

@@ -26,7 +26,6 @@ for the third party softwares, please visit:
 # TODO
     - Add defaults gains (gain_SE, gain_DIFF, etc) in cst files and add use them in examples/tests/selftests --> en cours
     - Add selftests capabilities 
-    - Add measurement methods/class --> skeleton OK 
     - Add calibration routines --> skeleton OK 
     - Comments
     - add verbosity mode
@@ -42,3 +41,8 @@ for the third party softwares, please visit:
     - test connect_TIA_to_CH2, disconnect_TIA_from_CH2, disable_current_source, enable_potentiostat
     - test dc feedback
     - Offset values are odds (measure seems ok tho)
+
+# Calibration todo
+    - Offset calibration
+    - DC calibration
+    - OSL calibration

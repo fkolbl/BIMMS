@@ -4,6 +4,7 @@ import numpy as np
 from ..backend.BIMMS_Class import BIMMS_class, abstractmethod
 from ..system.BIMMScalibration import BIMMScalibration
 from ..utils import constants as BIMMScst
+from ..results.Results import Results_class
 import matplotlib.pyplot as plt
 
 class Measure(BIMMS_class):
@@ -14,7 +15,6 @@ class Measure(BIMMS_class):
     def __init__(self, ID=0):
         super().__init__()
         self.ID = ID
-        self.raw = False
 
     def set_parameters(self,**kawrgs):
         for key in kawrgs:
@@ -70,12 +70,9 @@ class EIS(Measure):
             Nperiods=self.NPeriods,
             verbose=BS.verbose,
         )
-
-        if not self.raw:
-            mag, phase = BS.bode2impendance(gain_mes, phase_mes, freq, gain_ch1)
-
-        results = {'freq':freq, 'mag':mag, 'phase':phase}
-        return results
+        bode_data = {'freq':freq, 'mag_ch1_raw':gain_ch1,'mag_gain_raw':gain_mes, 'phase_raw':phase_mes}
+        results = Results_class(bode_data,BS)
+        return results.EIS()
 
 class TemporalSingleFrequency(Measure):
     def __init__(self,freq=1e3, phase=0, symmetry=50, Nperiod=8, delay=0, ID=0):
@@ -124,8 +121,7 @@ class TemporalSingleFrequency(Measure):
         chan1, chan2 = BS.get_input_data()
         BS.AWG_enable(False)
 
-        if not self.raw:
-            chan1, chan2 = BS.Scope2calibration(chan1, chan2, t, self.freq)
+        chan1, chan2 = BS.Scope2calibration(chan1, chan2, t, self.freq)
 
         results = {'t':t, 'chan1':chan1, 'chan2':chan2}
         return results
@@ -168,8 +164,7 @@ class Offset(Measure):
             ch1_offset = ch1_offset[0]
             ch2_offset = ch2_offset[0]          
         
-        if not self.raw:
-            ch1_offset, ch2_offset = BS.Scope2calibration(ch1_offset, ch2_offset, [0])
+        ch1_offset, ch2_offset = BS.Scope2calibration(ch1_offset, ch2_offset, [0])
 
         results = {
             'ch1_offset':ch1_offset, 'ch2_offset':ch2_offset}
@@ -202,7 +197,7 @@ class Bode(Measure):
 
     def measure(self, BS: BIMMScalibration):
         BS.ad2.configure_network_analyser()	#need to be checked
-        freq, gain_mes, phase_mes, gain_ch1 = BS.ad2.bode_measurement(
+        freq, mag_raw, phase_raw, mag_ch1_raw = BS.ad2.bode_measurement(
             self.fmin,
             self.fmax,
             n_points=self.n_pts,
@@ -215,6 +210,6 @@ class Bode(Measure):
             verbose=BS.verbose,
         )
 
-        gain_ch2 = gain_ch1/gain_mes
-        results = {'freq':freq, 'mag_ch1':gain_ch1,'mag_ch2':gain_ch2, 'phase':phase_mes}
-        return(results)
+        bode_data = {'freq':freq, 'mag_ch1_raw':mag_ch1_raw,'mag_raw':mag_raw, 'phase_raw':phase_raw}
+        results = Results_class(bode_data,BS)
+        return results.bode()

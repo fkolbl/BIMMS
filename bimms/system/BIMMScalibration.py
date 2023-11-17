@@ -112,6 +112,9 @@ class BIMMScalibration(BIMMSconfig):
     #####################################
 
     def bode2impendance(self, *args):
+
+        if (not(self.calibrated)):
+            pass
         return args[:2]
 
     def Scope2calibration(self, *args):
