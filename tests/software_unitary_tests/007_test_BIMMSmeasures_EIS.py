@@ -24,4 +24,3 @@ del BS
 plt.figure()
 plt.semilogx(results['freq'],results['mag'])
 plt.show()
-
