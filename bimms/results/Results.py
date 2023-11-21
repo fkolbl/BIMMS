@@ -26,7 +26,6 @@ class Results_class(BIMMS_class, dict):
 
     def __setitem__(self, key, value):
         self.__dict__[key] = value
-        print(key, value)
         super().__setitem__(key, value)
 
     def __sync(self):
