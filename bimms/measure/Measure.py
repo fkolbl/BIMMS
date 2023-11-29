@@ -70,7 +70,7 @@ class EIS(Measure):
             verbose=BS.verbose,
         )
         bode_data = {'freq':freq, 'mag_ch1_raw':gain_ch1,'mag_gain_raw':gain_mes, 'phase_raw':phase_mes}
-        results = Results.bode_results(bode_data,BS)
+        results = Results.bode_results(BS,bode_data)
         results.EIS()
         return (results)
 

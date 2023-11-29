@@ -11,29 +11,28 @@ class BIMMS_results(BIMMS_class, dict):
     Results class for BIMMS
     """
     @abstractmethod
-    def __init__(self, config=None, Raw_data=None, ID=0):
+    def __init__(self, config=None, raw_data=None, ID=0):
         super().__init__()
+        self.config = {}
+        self.raw_data = {}
+
         self.__set_config(config)
-        self.__set_raw_data(Raw_data)
+        self.__set_raw_data(raw_data)
         self.__sync()
         
     def __set_config(self, config):
         if config is None:
             config = {}
         elif is_BIMMS_class(config):
-            config.save(save=False)
+            config = config.save(save=False)
         if "bimms_type" in config:
             config["result_type"] = config.pop("bimms_type")
         self.update({"config":config})
 
-    def __set_raw_data(self, Raw_data):
-        if Raw_data is None:
-            Raw_data = {}
-        elif is_BIMMS_class(Raw_data):
-            Raw_data.save(save=False)
-        if "bimms_type" in Raw_data:
-            Raw_data["result_type"] = Raw_data.pop("bimms_type")
-        self.update({"Raw_data":Raw_data})
+    def __set_raw_data(self, raw_data):
+        if raw_data is None:
+            raw_data = {}
+        self.update({"raw_data":raw_data})
 
     def save(self, save=False, fname="bimms_save.json", blacklist=[], **kwargs):
         self.__sync()
@@ -73,14 +72,21 @@ class bode_results(BIMMS_results):
 
     """
     def __init__(self,BIMMS,data, ID=0):
-        super().__init__(ID)
+        super().__init__(config = BIMMS.config,raw_data=data,ID=ID)
         self.BIMMS = BIMMS
-        self.data = data
+        self['freq'] = self.raw_data['freq']
 
     def EIS(self):
         print("WARNING: Not fully implemented")
+        self['mag'] = self.raw_data['mag_gain_raw']
+        self['phase'] = self.raw_data['phase_raw']
 
-        results['mag'] = data['']
+        
+
+
+
+
+        #results['mag'] = data['']
 
     
 
