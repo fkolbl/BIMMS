@@ -4,8 +4,7 @@ import numpy as np
 from ..backend.BIMMS_Class import BIMMS_class, abstractmethod
 from ..system.BIMMScalibration import BIMMScalibration
 from ..utils import constants as BIMMScst
-from ..results.Results import Results_class
-import matplotlib.pyplot as plt
+from ..results import Results
 
 class Measure(BIMMS_class):
     """
@@ -71,8 +70,9 @@ class EIS(Measure):
             verbose=BS.verbose,
         )
         bode_data = {'freq':freq, 'mag_ch1_raw':gain_ch1,'mag_gain_raw':gain_mes, 'phase_raw':phase_mes}
-        results = Results_class(bode_data,BS)
-        return results.EIS()
+        results = Results.bode_results(bode_data,BS)
+        results.EIS()
+        return (results)
 
 class TemporalSingleFrequency(Measure):
     def __init__(self,freq=1e3, phase=0, symmetry=50, Nperiod=8, delay=0, ID=0):
@@ -98,7 +98,6 @@ class TemporalSingleFrequency(Measure):
     def set_delay(self, delay):
         self.set_parameters(delay=delay)
 
-
     def measure(self, BS: BIMMScalibration):
         # set the generators
         BS.AWG_sine(freq=self.freq, amp=BS.awg_amp,activate = False,offset = BS.awg_offset, phase=self.phase,
@@ -123,7 +122,8 @@ class TemporalSingleFrequency(Measure):
 
         chan1, chan2 = BS.Scope2calibration(chan1, chan2, t, self.freq)
 
-        results = {'t':t, 'chan1':chan1, 'chan2':chan2}
+        data = {'t':t, 'chan1':chan1, 'chan2':chan2}
+        results = Results.temporal_results(BS,data)
         return results
 
 class Offset(Measure):
@@ -211,5 +211,5 @@ class Bode(Measure):
         )
 
         bode_data = {'freq':freq, 'mag_ch1_raw':mag_ch1_raw,'mag_raw':mag_raw, 'phase_raw':phase_raw}
-        results = Results_class(bode_data,BS)
-        return results.bode()
+        results = Results.bode_results(BS,bode_data)
+        return results

@@ -17,7 +17,7 @@ BS.config.I_amplitude = 100 # uA
 BS.config.V_amplitude = 250 # mV
 
 for i in range(3):
-    BS.attach_measure(bm.EIS(fmin=1,fmax=1e6,n_pts=101,settling_time=0.01,NPeriods=8, ID=i))
+    BS.attach_measure(bm.EIS(fmin=1e3,fmax=1e6,n_pts=101,settling_time=0.01,NPeriods=8, ID=i))
 
 results = BS.measure()
 del BS
