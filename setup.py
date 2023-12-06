@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
    name='bimms',
-   version='1.0.0',
+   version='1.0.1',
    description='BIMMS python API',
    long_description = 'file: README.md',
    author='Louis Regnacq - Florian Kolbl - Thomas Couppey',
