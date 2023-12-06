@@ -2,10 +2,10 @@ from setuptools import setup
 
 setup(
    name='bimms',
-   version='0.0.1',
+   version='1.0.0',
    description='BIMMS python API',
    long_description = 'file: README.md',
-   author='Louis Regnacq - Florian Kolbl',
+   author='Louis Regnacq - Florian Kolbl - Thomas Couppey',
    packages=['bimms'],  #same as name
    include_package_data = True,
    url = 'https://github.com/fkolbl/BIMMS',

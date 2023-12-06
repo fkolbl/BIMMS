@@ -1,0 +1,41 @@
+# Meta information: PyPI and Pip
+
+[project]
+name = 'bimms'
+authors = [{name='Louis Regnacq - Florian Kolbl'}]
+license = {file='License.txt'}
+keywords = ['bioimpedance', 'hardware', 'electronics', 'measurements',
+            'spectroscopy', 'potentiostat', 'galvanostat']
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: POSIX :: Linux',
+    'Operating System :: MacOS :: MacOS X',
+    'Natural Language :: English']
+readme = 'pypi.md'
+requires-python = '>=3.6'
+dependencies = ['numpy','andi-py','matplotlib','scipy']
+dynamic = ['version', 'description']
+
+[project.urls]
+Documentation = 'https://bimms.readthedocs.io'
+Source = 'https://github.com/fkolbl/bimms'
+
+
+[tool.bumpver]
+current_version = "1.0.0"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message  = "Bump version {old_version} -> {new_version}"
+commit          = true
+tag             = true
+push            = false
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = ['current_version = "{version}"', 'version = "{version}"']
+"setup.py" = ['version = "{version}"']
+"bimms/__init__.py" = ["{version}"]
