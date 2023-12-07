@@ -198,7 +198,7 @@ Thumbs.db
 .prof
 
 # test bimms
-tests.hardware_unitary_tests.figures_hardware
-tests.software_unitary_tests.figures_software
+tests/hardware_unitary_tests/figures_hardware/
+tests/software_unitary_tests/figures_software/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,macos,linux
