@@ -25,6 +25,28 @@ def convert(int32_val):
     ]  # MSBs First
     return int8_arr
 
+#Return true if val is in range else false
+def in_range(val,range):
+    if (np.abs(val)>range):
+        return(False)
+    return(True)
+
+def in_range_min_max(val,min,max):
+    if (val < min) or (val>max):
+        return(False)
+    else:
+        return(True)
+
+#return true if val is close to expected (tol in %) else return false
+def in_tol(val,expected,tol):
+    tol = tol/100
+    max_val = expected *(1+tol)
+    min_val = expected *(1-tol)
+    if (val < min_val) or (val>max_val):
+        return(False)
+    else:
+        return(True)
+
 
 def ComputeSplitFit(coef_list, freq_lim, freq):
     Nsplit = len(freq_lim)

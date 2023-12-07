@@ -58,8 +58,10 @@ class BIMMS(BIMMScalibration):
     def measure(self,clear_mstack = True):
         self.check_config()
         self.set_config()
-        sleep(0.1)
+        if self.config.config_settling:
+            sleep(self.config.config_settling)
         self.get_awg_parameters()
+        self.get_recording_gains()
         if len(self.measures) == 1:
             m = self.measures[0]
             self.results = {
@@ -67,6 +69,7 @@ class BIMMS(BIMMScalibration):
                 "measure": m.save()
             }
             self.results.update(m.measure(self))
+            
         else:
             for m in self.measures:
                 self.results[m.ID] = {

@@ -41,13 +41,13 @@ class BIMMSconfig(BIMMShardware):
         super().__init__(bimms_id=bimms_id, serialnumber=serialnumber)
 
         self.set_STM32_idle()
-
+        self.set_STM32_stopped()
 
         self.config = config_mode_list()
         self.test_config = config_mode_list()
         self.config_mode = config_mode("MEASURE" ,"TEST", default="MEASURE")
 
-        ## Measeremenet
+        ## Measuremenet
         self.config.add_mode("excitation_sources", config_mode("EXTERNAL" ,"INTERNAL", default="INTERNAL"))
         self.config.add_mode("excitation_mode",  config_mode("G_EIS", "P_EIS", default="P_EIS"))
         self.config.add_mode("wire_mode",  config_mode("2_WIRE", "4_WIRE", "2", "4",default="2_WIRE"))
@@ -66,6 +66,9 @@ class BIMMSconfig(BIMMShardware):
         # Signals
         self.config.add_mode("I_amplitude", config_range(cst.min_current, cst.max_current, default=cst.default_current))
         self.config.add_mode("V_amplitude", config_range(cst.min_voltage, cst.max_voltage, default=cst.default_voltage))
+
+        # Other
+        self.config.add_mode("config_settling", config_range(0, 100, default=0))
 
 
         #TEST CONFIG (Excitation)
@@ -132,7 +135,7 @@ class BIMMSconfig(BIMMShardware):
         gain_IA1 = cst.gain_IA1
         gain_IA2 = cst.gain_IA2
         idx_gain = np.where(gain_array == gain)
-        idx_gain = idx_gain[0]
+        idx_gain = int(idx_gain[0])
         if idx_gain != None:
             if channel == 1:
                 self.set_gain_ch1_1(gain_IA1[idx_gain])
@@ -170,6 +173,9 @@ class BIMMSconfig(BIMMShardware):
 
         # Send the configuration to set the relays
         if (send):
+            if not (self.get_state()==cst.STM32_idle):
+                self.set_STM32_idle()
+                pass
             self.send_config()
 
     def reset_config(self):
@@ -226,9 +232,9 @@ class BIMMSconfig(BIMMShardware):
         """
         
         """
-
+        self.config.recording_signaling_mode_local = self.config.recording_signaling_mode
         if self.config.recording_signaling_mode == "AUTO":
-            self.config.recording_signaling_mode(str(self.config.excitation_signaling_mode))
+            self.config.recording_signaling_mode_local = str(self.config.excitation_signaling_mode)
 
         if self.config.recording_mode == "I":
             self.set_I_recording()
@@ -257,25 +263,26 @@ class BIMMSconfig(BIMMShardware):
         self.connect_TIA_to_CH2()
         self.connect_TIA_to_StimNeg()
         if self.config.excitation_mode == "G_EIS":
-            print("I_recording signalling configuration forced.")
+            print("WARNING: I_recording signalling configuration forced.")
             if self.config.excitation_signaling_mode == "DIFF":
-                self.connect_TIA_Neg_to_Ineg()
+                self.connect_TIA_Neg_to_Ineg()  
+                self.set_TIA_AC_coupling() #???????? 
             else:
                 self.connect_TIA_Neg_to_ground()
         else:   # P_EIS
-            if self.config.recording_signaling_mode == "DIFF":
-                self.connect_TIA_Neg_to_Ineg()
+            if self.config.recording_signaling_mode_local == "DIFF":
+                self.connect_TIA_Neg_to_Vneg()
             else:
                 self.connect_TIA_Neg_to_ground()
 
     def set_V_recording(self):
         if self.config.recording_mode == "V":
             self.disconnect_CH2_from_scope_2()
-            ##self.disconnect_TIA_from_CH2() fix BUG
+            #self.disconnect_TIA_from_CH2() #BUG? 
         self.connect_CH1_to_scope_1()
         if self.config.excitation_mode == "G_EIS":
-            if self.config.recording_signaling_mode == "DIFF":
-                print("WARNING: Manual connection between V- and GND required (check CH1 jumper)")
+            if self.config.recording_signaling_mode_local == "SE" and self.config.excitation_signaling_mode == "DIFF":
+                print("WARNING: Manual connection between V- and GND required!")
 
     #######################################
     ##  test config methods ##
@@ -346,7 +353,8 @@ class BIMMSconfig(BIMMShardware):
         self.connect_TIA()
 
     def connect_TIA(self):
-        if (self.test_config.connect_TIA):
+        if (self.test_config.connect_TIA== True):
+
             self.connect_TIA_to_StimNeg()
 
         if (self.test_config.TIA_to_CH2==True):
@@ -395,3 +403,6 @@ class BIMMSconfig(BIMMShardware):
 
 
        
+    #######################################
+    ##  Other methods ##
+    #######################################

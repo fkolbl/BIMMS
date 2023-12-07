@@ -3,24 +3,30 @@ import matplotlib.pyplot as plt
 from time import sleep
 
 BS = bm.BIMMS()
-BS.excitation_sources("INTERNAL")
-BS.excitation_mode("P_EIS")
-BS.wire_mode("2_WIRE")
-BS.recording_mode("BOTH")
-BS.excitation_signaling_mode("SE")
-BS.recording_signaling_mode("AUTO")
-BS.excitation_coupling("DC")
-BS.G_EIS_gain = "LOW"
-BS.IRO_gain = 1
-BS.VRO_gain = 1
-BS.DC_feedback = False
-BS.set_config()
+BS.config.excitation_sources("INTERNAL")
+BS.config.excitation_mode("P_EIS")
+BS.config.wire_mode("2_WIRE")
+BS.config.recording_mode("BOTH")
+BS.config.excitation_signaling_mode("SE")
+BS.config.recording_signaling_mode("AUTO")
+BS.config.excitation_coupling("DC")
+BS.config.G_EIS_gain = "LOW"
+BS.config.IRO_gain = 1
+BS.config.VRO_gain = 1
+BS.config.DC_feedback = False
+BS.config.V_amplitude = 100 # mV
 
+m1 = bm.TemporalSingleFrequency(freq = 10000,Nperiod=10,phase = 90)
+BS.attach_measure(m1)
+results = BS.measure()
+del BS
 
-t,dat0,dat1 = bm.TemporalSingleFrequency(BS,amp=0.1,Freq = 10000,Nperiod=10,Phase = 90)
+t = results['t']
+ch1  = results['chan1_raw']
+ch2 = results['chan2_raw']
 
 plt.figure()
-plt.plot(t,dat0)
-plt.plot(t,dat1)
-plt.show()
+plt.plot(t,ch1)
+plt.plot(t,ch2)
+plt.savefig('./figures_software/008_singleFreqAcquisition.png')
 

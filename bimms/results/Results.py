@@ -65,7 +65,7 @@ class BIMMS_results(BIMMS_class, dict):
 
 class Results_test(BIMMS_results):
     def __init__(self, ID=0):
-        super().__init__(ID)
+        super().__init__(ID=ID)
 
 class bode_results(BIMMS_results):
     """
@@ -75,11 +75,19 @@ class bode_results(BIMMS_results):
         super().__init__(config = BIMMS.config,raw_data=data,ID=ID)
         self.BIMMS = BIMMS
         self['freq'] = self.raw_data['freq']
+        self['mag_ch1_raw'] = self.raw_data['mag_ch1_raw']
+        self['mag_ch2_raw'] = self.raw_data['mag_ch1_raw']/self.raw_data['mag_raw']
+        self['phase_raw'] = self.raw_data['phase_raw']
+        if (self.BIMMS.calibrated):
+            pass
+        else:
+            self['V_readout'] =  self['mag_ch1_raw']/self.BIMMS.cal_ch1_gain
+            self['I_readout'] = self['mag_ch2_raw']/(self.BIMMS.cal_ch2_gain*self.BIMMS.cal_TIA_gain)
 
     def EIS(self):
-        print("WARNING: Not fully implemented")
-        self['mag'] = self.raw_data['mag_gain_raw']
-        self['phase'] = self.raw_data['phase_raw']
+        print("WARNING: EIS measure not fully implemented")
+        self['mag_Z'] = self['V_readout']/self['I_readout']
+        self['phase_Z'] = self.raw_data['phase_raw']
 
         
 
@@ -97,10 +105,10 @@ class temporal_results(BIMMS_results):
 
     """
     def __init__(self,BIMMS,data, ID=0):
-        super().__init__(ID)
+        super().__init__(config = BIMMS.config,raw_data=data,ID=ID)
         self.BIMMS = BIMMS
-        self.data = data
-    
 
-
-
+        print("WARNING: temporal post-processing measure not fully implemented")
+        self['t'] = self.raw_data['t']
+        self['chan2_raw'] = self.raw_data['chan2']
+        self['chan1_raw'] = self.raw_data['chan1']

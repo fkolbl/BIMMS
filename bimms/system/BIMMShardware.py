@@ -20,6 +20,7 @@ import os
 import andi as ai
 import os
 from warnings import warn
+import time
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
@@ -83,12 +84,13 @@ class BIMMShardware(BIMMSad2):
         self.LED_err = 0
 
         # Free AD2 DIO (O is input, 1 is ouput)
-        self.IO6_IO = 0
-        self.IO7_IO = 0
+        self.IO6_IO = 1
+        self.IO7_IO = 1
         self.IO6_value = 0
         self.IO7_value = 0
 
         self.set_DIO_mode()
+        #self.set_DIO_output()
 
     def __start_STM32_com(self):
         self.SPI_init_STM32()
@@ -456,8 +458,8 @@ class BIMMShardware(BIMMSad2):
     def set_DIO_mode(self):
         IO_vector = 0
         IO_vector += self.IO6_IO * cst.IO6
+        IO_vector += self.IO7_IO * cst.IO7
 
-        # IO_vector += self.IO7_IO * cst.IO7
         # LEDs and IA gain IOs are always set as outputs
         IO_vector += cst.LED_status
         IO_vector += cst.LED_err
@@ -469,9 +471,10 @@ class BIMMShardware(BIMMSad2):
         IO_vector += cst.CH2_A1_0
         IO_vector += cst.CH2_A0_1
         IO_vector += cst.CH2_A1_1
+        self.IO_vector = IO_vector
         self.ad2.digitalIO_set_as_output(IO_vector)
 
-    def set_DIO_output(self):
+    def set_DIO_output(self): #Need modifications!!
         OUTPUT_vector = 0
         OUTPUT_vector += self.IO6_value * cst.IO6
         OUTPUT_vector += self.IO7_value * cst.IO7
@@ -486,7 +489,7 @@ class BIMMShardware(BIMMSad2):
         OUTPUT_vector += self.CH2_A1_0 * cst.CH2_A1_0
         OUTPUT_vector += self.CH2_A0_1 * cst.CH2_A0_1
         OUTPUT_vector += self.CH2_A1_1 * cst.CH2_A1_1
-
+        self.OUTPUT_vector = OUTPUT_vector
         self.ad2.digitalIO_output(OUTPUT_vector)
 
     def set_gain_ch1_1(self, value):
@@ -587,15 +590,23 @@ class BIMMShardware(BIMMSad2):
 
     def set_STM32_stopped(self):
         self.set_state(cst.STM32_stopped)
+        if (HardwareVerbose):
+            print("Hardware Info: STM32 set to stop mode")
 
     def set_STM32_idle(self):
         self.set_state(cst.STM32_idle)
+        if (HardwareVerbose):
+            print("Hardware Info: STM32 set to Idle mode")
 
     def set_STM32_locked(self):
         self.set_state(cst.STM32_locked)
+        if (HardwareVerbose):
+            print("Hardware Info: STM32 set to lock mode")
 
     def set_STM32_error(self):
         self.set_state(cst.STM32_error)
+        if (HardwareVerbose):
+            print("Hardware Info: STM32 set to error mode")
 
     def get_state(self):
         """

@@ -63,6 +63,33 @@ class BIMMScalibration(BIMMSconfig):
         print("validate_excitation_parameter not implemented")
         pass
 
+    def get_recording_gains(self):
+        self.check_calibration()
+        self.cal_ch1_gain = None
+        self.cal_ch2_gain = None
+        self.cal_TIA_gain = None
+        if self.calibrated:
+            pass
+        else:
+            self.get_default_ch1_gain()
+            self.get_default_ch2_gain()
+            self.get_default_TIA_gain()
+
+    def get_default_ch2_gain(self):
+        if (self.config_mode == "MEASURE"):
+            self.cal_ch2_gain = int(self.config.IRO_gain)
+        else:
+            self.cal_ch2_gain = int(self.test_config.CH2_gain)
+
+    def get_default_ch1_gain(self):
+        if (self.config_mode == "MEASURE"):
+            self.cal_ch1_gain = int(self.config.VRO_gain)
+        else:
+            self.cal_ch1_gain = int(self.test_config.CH1_gain)
+    
+    def get_default_TIA_gain(self):
+        self.cal_TIA_gain = cst.TIA_gain_default
+
     def get_awg_parameters(self):
         """
         
@@ -75,26 +102,26 @@ class BIMMScalibration(BIMMSconfig):
                 self.awg_amp = float(self.config.V_amplitude)
                 unit = cst.V2mV
                 if self.config.excitation_signaling_mode == "DIFF":
-                    self.awg_offset = cst.voltage_DIFF_offset_default
-                    self.awg_gain = 1 / cst.Vsource_DIFF_G_default
+                    self.awg_offset = cst.VCVS_DIFF_G_default
+                    self.awg_gain = 1 / cst.VCVS_DIFF_G_default
                 else:   # SE
-                    self.awg_offset = cst.voltage_SE_offset_default
-                    self.awg_gain = 1 / cst.Vsource_SE_G_default
+                    self.awg_offset = cst.VCVS_SE_offset_default
+                    self.awg_gain = 1 / cst.VCVS_SE_G_default
             else: # P_EIS
                 self.awg_amp = float(self.config.I_amplitude)
                 unit = cst.A2uA
                 if self.config.G_EIS_gain == "LOW":
-                    self.awg_gain =  cst.Isource_LowR_default / cst.Vsource_DIFF_G_default
+                    self.awg_gain =  cst.VCCS_LowR_default / cst.VCVS_DIFF_G_default
                     if self.config.excitation_signaling_mode == "DIFF":
-                        self.awg_offset = cst.current_LowR_DIFF_offset_default
+                        self.awg_offset = cst.VCCS_LowR_DIFF_offset_default
                     else: #SE
-                        self.awg_offset = cst.current_LowR_SE_offset_default
+                        self.awg_offset = cst.VCCS_LowR_SE_offset_default
                 else:   #HIGH
-                    self.awg_gain = cst.Isource_HighR_default / cst.Vsource_DIFF_G_default
+                    self.awg_gain = cst.VCCS_HighR_default / cst.VCVS_DIFF_G_default
                     if self.config.excitation_signaling_mode == "DIFF":
-                        self.awg_offset = cst.current_HighR_DIFF_offset_default
+                        self.awg_offset = cst.VCCS_HighR_DIFF_offset_default
                     else: #SE
-                        self.awg_offset = cst.current_HighR_SE_offset_default
+                        self.awg_offset = cst.VCCS_HighR_SE_offset_default
 
             if self.calibrated:
                 self.awg_offset = self.cal_awg_offset

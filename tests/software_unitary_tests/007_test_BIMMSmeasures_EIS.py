@@ -20,7 +20,6 @@ m1 = bm.EIS(fmin=1000,fmax=1e7,n_pts=101,settling_time=0.01,NPeriods=8)
 BS.attach_measure(m1)
 results = BS.measure()
 del BS
-
 plt.figure()
-plt.semilogx(results['freq'],results['mag'])
-plt.show()
+plt.semilogx(results['freq'],results['mag_Z'])
+plt.savefig('./figures_software/007_EIS.png')

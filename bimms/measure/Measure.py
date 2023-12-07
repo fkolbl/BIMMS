@@ -69,7 +69,7 @@ class EIS(Measure):
             Nperiods=self.NPeriods,
             verbose=BS.verbose,
         )
-        bode_data = {'freq':freq, 'mag_ch1_raw':gain_ch1,'mag_gain_raw':gain_mes, 'phase_raw':phase_mes}
+        bode_data = {'freq':freq, 'mag_ch1_raw':gain_ch1,'mag_raw':gain_mes, 'phase_raw':phase_mes}
         results = Results.bode_results(BS,bode_data)
         results.EIS()
         return (results)
@@ -119,9 +119,6 @@ class TemporalSingleFrequency(Measure):
         BS.AWG_enable(True)
         chan1, chan2 = BS.get_input_data()
         BS.AWG_enable(False)
-
-        chan1, chan2 = BS.Scope2calibration(chan1, chan2, t, self.freq)
-
         data = {'t':t, 'chan1':chan1, 'chan2':chan2}
         results = Results.temporal_results(BS,data)
         return results

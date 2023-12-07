@@ -11,7 +11,7 @@ import argparse
 import cmd
 
 ## ARGUMENT PARSER ##
-parser = argparse.ArgumentParser(description="NeuRon Virtualizer automated test module")
+parser = argparse.ArgumentParser(description="BIMMS automated test module")
 parser.add_argument("-H", "--Hardware", action="store_true", dest="H_TEST",help="")
 parser.add_argument("-t", "--target", dest="TARGET", type=int, nargs="+" ,default=0, help="The number of the tests to simulate")
 parser.add_argument("-l", "--list", dest="LIST_TEST",type=int, nargs="?",default=-1, help="Print the name of all unitary tests")
@@ -19,12 +19,15 @@ parser.add_argument("-l", "--list", dest="LIST_TEST",type=int, nargs="?",default
 args = parser.parse_args()
 if args.H_TEST:
     unit_test_folder = './hardware_unitary_tests/'
+    unit_test_results = './hardware_unitary_tests/figures_hardware/'
+
 else:
     unit_test_folder = './software_unitary_tests/'
+    unit_test_results = './software_unitary_tests/figures_software/'
 
 all_tests = sorted(os.listdir(unit_test_folder), reverse=True)
 all_tests.reverse()
-unit_test_results = './unitary_tests/figures/'
+
 digits = [str(k) for k in range(10)]
 all_tests [:] = (value for value in all_tests if value[0] in digits)
 

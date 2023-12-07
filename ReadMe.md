@@ -24,16 +24,13 @@ for the third party softwares, please visit:
 [Waveform](https://digilent.com/shop/software/digilent-waveforms/)
 
 # TODO
-    - Add defaults gains (gain_SE, gain_DIFF, etc) in cst files and add use them in examples/tests/selftests --> en cours
     - Add selftests capabilities 
     - Add calibration routines --> skeleton OK 
     - Comments
     - add verbosity mode
     - do "standard configuration" 
     - add check_saturation 
-    - change HIGH/LOW GAIN 
-    - Test multiple measurements in a row
-    - results class
+    - add auto HIGH/LOW GAIN 
     - offset compensation in scope input
 
 # HARDWARE TEST TODO:
@@ -41,8 +38,18 @@ for the third party softwares, please visit:
     - test connect_TIA_to_CH2, disconnect_TIA_from_CH2, disable_current_source, enable_potentiostat
     - test dc feedback
     - Offset values are odds (measure seems ok tho)
+    - Test Readout AC coupling (IA, TIA, etc) --> TIA AC COupling???
 
 # Calibration todo
     - Offset calibration
     - DC calibration
     - OSL calibration
+
+
+#TODO CONF AD2:
+#SET in_channel_range_set --> 2.0,5.0 or 5.0 --> 2.0 by default; check if saturation?
+#BS.ad2.in_average_filter_mode(-1)
+#AD2 attenation = 1.0
+#AD2 offsets = 0.0 
+#Triggers --> AWG by default --> external TODO
+#Conf modes (bode,)

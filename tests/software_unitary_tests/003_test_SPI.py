@@ -37,4 +37,5 @@ for k in offsets:
 	value += rx*k
 ad2.SPI_select(cst.STM32_CS_p,ai.LogicLevel['H'])
 
+ad2.close()
 

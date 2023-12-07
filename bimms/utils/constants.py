@@ -109,15 +109,33 @@ AD2_IRO_ch = 1     #Current readout connected to AD2 scope CH2
 
 
 #Default Analog Gains
-Vsource_SE_G_default = 1.1                                          #Default Voltage source gain (Single-Ended)
-Vsource_DIFF_G_default = 2.2                                        #Default Voltage source gain (Differential)
-Isource_LowR_max = 50000                                            #Maximum Rg in Low Gain mode (G current source = 1/Rg)
-Isource_LowR_min = 1000                                             #Minimum Rg in Low Gain mode 
-Isource_LowR_default = (Isource_LowR_max+Isource_LowR_min)/2        #Default Rg value in Low gain mode
-Isource_HighR_max = 94000                                           #Maximum Rg in High Gain mode 
-Isource_HighR_min = 47000                                           #Minimum Rg in High Gain mode 
-Isource_HighR_default = (Isource_HighR_max+Isource_HighR_min)/2     #Default Rg value in High gain mode
-TIA_G_default = 100                                                 #Default TIA gain
+VCVS_SE_G_default = 1.1                                          #Default Voltage source gain (Single-Ended)
+VCVS_DIFF_G_default = 2.2                                        #Default Voltage source gain (Differential)
+VCCS_LowR_max = 51000                                            #Maximum Rg in Low Gain mode (G current source = 1/Rg)
+VCCS_LowR_min = 1000                                             #Minimum Rg in Low Gain mode 
+VCCS_LowR_default = (VCCS_LowR_max+VCCS_LowR_min)/2        #Default Rg value in Low gain mode
+VCCS_HighR_max = 94000                                           #Maximum Rg in High Gain mode 
+VCCS_HighR_min = 47000                                           #Minimum Rg in High Gain mode 
+VCCS_HighR_default = (VCCS_HighR_max+VCCS_HighR_min)/2     #Default Rg value in High gain mode
+
+VCCS_default_HG = VCVS_DIFF_G_default*1e6/VCCS_LowR_default   #gain in uA/V
+VCCS_default_LG = VCVS_DIFF_G_default*1e6/VCCS_HighR_default  #gain in uA/V
+VCVS_gain_tol = 10              #gain tolerance in %
+
+VCCS_min_LG = VCVS_DIFF_G_default*1e6/VCCS_HighR_max           #gain in uA/V
+VCCS_max_LG = VCVS_DIFF_G_default*1e6/VCCS_HighR_min           #gain in uA/V
+VCCS_min_HG = VCVS_DIFF_G_default*1e6/VCCS_LowR_max            #gain in uA/V
+VCCS_max_HG = VCVS_DIFF_G_default*1e6/VCCS_LowR_min            #gain in uA/V
+
+VCCS_min_LG = VCCS_min_LG*(1-VCVS_gain_tol/100)
+VCCS_max_LG = VCCS_max_LG*(1+VCVS_gain_tol/100)
+VCCS_min_HG = VCCS_min_HG*(1-VCVS_gain_tol/100)
+VCCS_max_HG = VCCS_max_HG*(1+VCVS_gain_tol/100)
+
+
+TIA_gain_default = 100                                                 #Default TIA gain
+TIA_gain_tol = 10                               #TIA GAIN tolerance in %
+
 
 #Max/Min excitation current and voltage
 max_current = float(1e3)       # uA
@@ -128,12 +146,12 @@ min_voltage = 0.         # mV
 default_voltage = 1e2   # mV
 
 #Default compensation offsets
-current_LowR_SE_offset_default = 0
-current_LowR_DIFF_offset_default = 0
-current_HighR_SE_offset_default = 0
-current_HighR_DIFF_offset_default = 0
-voltage_SE_offset_default = 0
-voltage_DIFF_offset_default = 0
+VCCS_LowR_SE_offset_default = 0
+VCCS_LowR_DIFF_offset_default = 0
+VCCS_HighR_SE_offset_default = 0
+VCCS_HighR_DIFF_offset_default = 0
+VCVS_SE_offset_default = 0
+VCVS_DIFF_offset_default = 0
 
 #Max/min Voltage and Current readout values
 max_current_readout = 1
@@ -142,7 +160,34 @@ max_voltage_readout = 1
 min_voltage_readout = 0
 
 #Self-test constants
-max_readout_offset = 1
+max_IA_DC_offset = 5e-3     #Max DC IA offset (in V)
+max_IA_AC_offset = 50e-3     #Max AC IA offset (in V)
+IA_gain_DC_tol = 1             #IA gain DC tolerance (in %)
+IA_gain_AC_tol = 75             #IA gain AC tolerance (in %) 
+
+max_VCVS_SE_DC_offset = 50e-3   #Max DC-SE voltage source offset (in V)
+max_VCVS_SE_AC_offset = 50e-3   #Max AC-SE voltage source offset (in V)
+max_VCVS_DIFF_DC_offset = 50e-3   #Max DC-DIFF voltage source offset (in V)
+max_VCVS_DIFF_AC_offset = 50e-3   #Max AC-DIFF voltage source offset (in V)
+
+VCVS_SE_DC_gain_tol = 5
+VCVS_SE_AC_gain_tol = 5
+VCVS_DIFF_DC_gain_tol = 5
+VCVS_DIFF_AC_gain_tol = 5
+
+max_VCCS_SE_HG_DC_offset = 10   #Max HG-DC-SE current source offset (in µA)
+max_VCCS_SE_HG_AC_offset = 10  #Max HG-DC-SE current source offset (in µA)
+max_VCCS_DIFF_HG_DC_offset = 10   #Max HG-DC-SE current source offset (in µA)
+max_VCCS_DIFF_HG_AC_offset = 10   #Max HG-DC-SE current source offset (in µA)
+max_VCCS_SE_LG_DC_offset = 10   #Max LG-DC-SE current source offset (in µA)
+max_VCCS_SE_LG_AC_offset = 10  #Max LG-DC-SE current source offset (in µA)
+max_VCCS_DIFF_LG_DC_offset = 10   #Max LG-DC-SE current source offset (in µA)
+max_VCCS_DIFF_LG_AC_offset = 10   #Max LG-DC-SE current source offset (in µA)
+
+max_TIA_SE_DC_offset = 50e-3   #Max DC-SE TIA source offset (in V)
+max_TIA_SE_AC_offset = 50e-3   #Max AC-SE TIA source offset (in V)
+max_TIA_DIFF_DC_offset = 50e-3   #Max DC-DIFF TIA source offset (in V)
+max_TIA_DIFF_AC_offset = 50e-3   #Max AC-DIFF TIA source offset (in V)
 
 #Conversion units
 
