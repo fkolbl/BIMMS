@@ -37,3 +37,4 @@ for k in range (5):
 	ad2.SPI_select(STM32_CS_p, ai.LogicLevel["H"])
 	time.sleep(1)
 
+ad2.close()
