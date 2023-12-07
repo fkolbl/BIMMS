@@ -264,7 +264,7 @@ if (test_single_freq):
     plt.plot(t,ch1, label = "HG-DIFF-AC")
 
     plt.legend(title = 'CH2 Gain:')
-    plt.savefig('./figures_hardware/003_current_source_temporal.png')        
+    plt.savefig('./hardware_unitary_tests/figures_hardware/003_current_source_temporal.png')        
     plt.close('all')
 
 
@@ -401,5 +401,5 @@ if (test_bode):
 
     plt.legend()
 
-    plt.savefig('./figures_hardware/003_current_source_bode.png')        
+    plt.savefig('./hardware_unitary_tests/figures_hardware/003_current_source_bode.png')        
     plt.close('all')

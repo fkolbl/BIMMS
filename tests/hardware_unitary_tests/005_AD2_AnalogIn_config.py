@@ -49,7 +49,7 @@ results = BS.measure()
 ch1 = (results['chan1_raw'])
 t = results['t']
 plt.plot(t,ch1,label = "AVERAGING MODE")
-plt.savefig('./figures_hardware/005_AD2_input_mode.png')
+plt.savefig('./hardware_unitary_tests/figures_hardware/005_AD2_input_mode.png')
 plt.close('all')
 
 #input attenuation
@@ -65,7 +65,7 @@ for range in range_list:
     plt.plot(t,ch1,label = str(range) +'V')
 
 plt.legend(title = 'Range:')
-plt.savefig('./figures_hardware/005_AD2_range.png')
+plt.savefig('./hardware_unitary_tests/figures_hardware/005_AD2_range.png')
 plt.close('all')
 
 

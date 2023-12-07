@@ -24,11 +24,11 @@ del BS
 
 plt.figure()
 for i in range(3):
-    plt.semilogx(results[i]['freq'],results[i]['mag'])
-plt.savefig('./figures_software/011_multipleEIS_mag.png')
+    plt.semilogx(results[i]['freq'],results[i]['mag_Z'])
+plt.savefig('./software_unitary_tests/figures_software/011_multipleEIS_mag.png')
 
 plt.figure()
 for i in range(3):
-    plt.semilogx(results[i]['freq'],results[i]['phase'])
-plt.savefig('./figures_software/011_multipleEIS_phase.png')
+    plt.semilogx(results[i]['freq'],results[i]['phase_Z'])
+plt.savefig('./software_unitary_tests/figures_software/011_multipleEIS_phase.png')
 

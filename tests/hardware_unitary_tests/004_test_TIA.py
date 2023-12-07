@@ -154,7 +154,7 @@ if (test_single_freq):
     ch2 = (results['chan2_raw'])
     t = results['t']
     plt.plot(t,ch2, label = "DIFF-AC")        
-    plt.savefig('./figures_hardware/004_TIA_temporal.png')
+    plt.savefig('./hardware_unitary_tests/figures_hardware/004_TIA_temporal.png')
     plt.close('all')
 
 
@@ -234,5 +234,5 @@ if (test_bode):
             raise Exception("Measured gain out of range")
 
 
-    plt.savefig('./figures_hardware/004_TIA_bode.png')
+    plt.savefig('./hardware_unitary_tests/figures_hardware/004_TIA_bode.png')
     plt.close('all')

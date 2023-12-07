@@ -55,7 +55,7 @@ results = BS.measure()
 plt.semilogx(results['freq'],results['mag_Z'], label = "DIFF_AC") 
 
 plt.legend()
-plt.savefig('./figures_hardware/007_GEIS_1k_config.png')
+plt.savefig('./hardware_unitary_tests/figures_hardware/007_GEIS_1k_config.png')
 plt.close('all')
 
 
@@ -67,7 +67,7 @@ for gain in g_list:
     BS.attach_measure(m1)
     results = BS.measure()
     plt.semilogx(results['freq'],results['mag_Z'], label = "gain_IRO: "+str(gain)) 
-plt.savefig('./figures_hardware/007_GEIS_1k_GAIN_IRO.png')
+plt.savefig('./hardware_unitary_tests/figures_hardware/007_GEIS_1k_GAIN_IRO.png')
 plt.close('all')
 
 #GAIN VRO
@@ -79,7 +79,7 @@ for gain in g_list:
     BS.attach_measure(m1)
     results = BS.measure()
     plt.semilogx(results['freq'],results['mag_Z'], label = "gain_VRO: "+str(gain)) 
-plt.savefig('./figures_hardware/007_GEIS_1k_GAIN_VRO.png')
+plt.savefig('./hardware_unitary_tests/figures_hardware/007_GEIS_1k_GAIN_VRO.png')
 plt.close('all')
 
 #BOTH GAIN
@@ -91,7 +91,7 @@ for gain in g_list:
     BS.attach_measure(m1)
     results = BS.measure()
     plt.semilogx(results['freq'],results['mag_Z'], label = "IRO_VRO_gain: "+str(gain)) 
-plt.savefig('./figures_hardware/007_GEIS_1k_GAIN_VRO_IRO.png')
+plt.savefig('./hardware_unitary_tests/figures_hardware/007_GEIS_1k_GAIN_VRO_IRO.png')
 plt.close('all')
 del BS
 

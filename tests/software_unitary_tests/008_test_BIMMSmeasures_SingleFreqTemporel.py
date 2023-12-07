@@ -28,5 +28,5 @@ ch2 = results['chan2_raw']
 plt.figure()
 plt.plot(t,ch1)
 plt.plot(t,ch2)
-plt.savefig('./figures_software/008_singleFreqAcquisition.png')
+plt.savefig('./software_unitary_tests/figures_software/008_singleFreqAcquisition.png')
 

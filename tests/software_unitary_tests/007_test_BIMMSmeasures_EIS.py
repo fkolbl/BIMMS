@@ -22,4 +22,4 @@ results = BS.measure()
 del BS
 plt.figure()
 plt.semilogx(results['freq'],results['mag_Z'])
-plt.savefig('./figures_software/007_EIS.png')
+plt.savefig('./software_unitary_tests/figures_software/007_EIS.png')

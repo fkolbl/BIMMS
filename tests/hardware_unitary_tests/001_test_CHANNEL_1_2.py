@@ -111,7 +111,7 @@ if (test_ch1):
             plt.plot(t,ch1, label = str(gain))
 
         plt.legend(title = 'CH1 Gain:')
-        plt.savefig('./figures_hardware/001_CHANNEL1_DC.png')
+        plt.savefig('./hardware_unitary_tests/figures_hardware/001_CHANNEL1_DC.png')
         plt.close('all')
 
         plt.figure()
@@ -127,7 +127,7 @@ if (test_ch1):
             t = results['t']
             plt.plot(t,ch1, label = str(gain))
         plt.legend(title = 'CH1 Gain:')
-        plt.savefig('./figures_hardware/001_CHANNEL1_AC.png')
+        plt.savefig('./hardware_unitary_tests/figures_hardware/001_CHANNEL1_AC.png')
         plt.close('all')
 
 
@@ -150,7 +150,7 @@ if (test_ch1):
                 if not (ignore_exception):
                     raise Exception("Measured IA gain out of tol")
         plt.legend(title = 'CH1 Gain:')
-        plt.savefig('./figures_hardware/001_CHANNEL1_BODE_DC.png')
+        plt.savefig('./hardware_unitary_tests/figures_hardware/001_CHANNEL1_BODE_DC.png')
         plt.close('all')
 
         plt.figure()
@@ -171,7 +171,7 @@ if (test_ch1):
                 if not (ignore_exception):
                     raise Exception("Measured IA gain out of tol")
         plt.legend(title = 'CH1 Gain:')
-        plt.savefig('./figures_hardware/001_CHANNEL1_BODE_AC.png')
+        plt.savefig('./hardware_unitary_tests/figures_hardware/001_CHANNEL1_BODE_AC.png')
         plt.close('all')
 
 BS.test_config.CH1_gain(1)
@@ -230,7 +230,7 @@ if (test_ch2):
             t = results['t']
             plt.plot(t,ch2, label = str(gain))
         plt.legend(title = 'CH2 Gain:')
-        plt.savefig('./figures_hardware/001_CHANNEL2_DC.png')
+        plt.savefig('./hardware_unitary_tests/figures_hardware/001_CHANNEL2_DC.png')
         plt.close('all')
 
         plt.figure()
@@ -246,7 +246,7 @@ if (test_ch2):
             t = results['t']
             plt.plot(t,ch2, label = str(gain))
         plt.legend(title = 'CH2 Gain:')
-        plt.savefig('./figures_hardware/001_CHANNEL2_AC.png')
+        plt.savefig('./hardware_unitary_tests/figures_hardware/001_CHANNEL2_AC.png')
         plt.close('all')
 
 
@@ -269,7 +269,7 @@ if (test_ch2):
                 if not (ignore_exception):
                     raise Exception("Measured IA gain out of tol")
         plt.legend(title = 'CH2 Gain:')
-        plt.savefig('./figures_hardware/001_CHANNEL2_BODE_DC.png')
+        plt.savefig('./hardware_unitary_tests/figures_hardware/001_CHANNEL2_BODE_DC.png')
         plt.close('all')
 
         plt.figure()
@@ -290,6 +290,6 @@ if (test_ch2):
                 if not (ignore_exception):
                     raise Exception("Measured IA gain out of tol")
         plt.legend(title = 'CH2 Gain:')
-        plt.savefig('./figures_hardware/001_CHANNEL2_BODE_AC.png')
+        plt.savefig('./hardware_unitary_tests/figures_hardware/001_CHANNEL2_BODE_AC.png')
         plt.close('all')
 

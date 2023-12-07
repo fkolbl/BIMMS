@@ -150,7 +150,7 @@ if (test_single_freq):
     t = results['t']
     plt.plot(t,ch1, label = "DIFF-AC")
     plt.legend()
-    plt.savefig('./figures_hardware/002_VCVS_temporal.png')
+    plt.savefig('./hardware_unitary_tests/figures_hardware/002_VCVS_temporal.png')
     plt.close('all')
 
 if (test_bode):
@@ -217,6 +217,6 @@ if (test_bode):
 
 
     plt.legend()
-    plt.savefig('./figures_hardware/002_VCVS_bode.png')
+    plt.savefig('./hardware_unitary_tests/figures_hardware/002_VCVS_bode.png')
     plt.close('all')
 
