@@ -1,53 +1,39 @@
-"""
-	Python script to perform Potentiostat EIS with BIMMS.
-	Authors: Florian Kolbl / Louis Regnacq
-	(c) ETIS - University Cergy-Pontoise
-		IMS - University of Bordeaux
-		CNRS
-
-	Requires:
-		Python 3.6 or higher
-		Analysis_Instrument - class handling Analog Discovery 2 (Digilent)
-
-"""
 import bimms as bm
 import numpy as np
 import matplotlib.pyplot as plt
 
-fmin = 1000            #Start Frequency (Hz)
-fmax = 10e6            #Stop Frequency (Hz)
-n_pts = 200           #Number of frequency points
-amp = 0.1              #amplitude (V)
-settling_time = 0.01   #Settling time between points
-NPeriods = 32          #Number of period per frequency points
-two_wires = True       #Connection to the DUT mode: True  = 2wires, False = 4wires
-
-output_file_name = "potentiostat_EIS.csv"
-
 BS = bm.BIMMS()
 
-freq, gain_mes, phase_mes = BS.potentiostat_EIS(fmin = fmin, fmax = fmax, n_pts = n_pts, V_amp = amp, V_offset = 0, settling_time = settling_time, NPeriods = NPeriods,
-	differential = False, two_wires = two_wires, coupling = 'DC', apply_cal = True)
+Gain_IRO = 20
+Gain_VRO = 20
+fmin = 1000
+fmax = 1e7
+n_pts = 101
+settling_time = 0.01
+NPeriods = 8
+V_stim = 100 #100mV excitation
 
-BS.close()
+BS.config.excitation_mode("P_EIS")
+BS.config.wire_mode("2_WIRE")
+BS.config.excitation_signaling_mode("SE")
+BS.config.excitation_coupling("DC")
 
-#dump data to csv
-data = np.asarray([freq,gain_mes,phase_mes])
-data = np.transpose(data)
-np.savetxt(output_file_name, data, delimiter=",")
+BS.config.IRO_gain(Gain_IRO)
+BS.config.VRO_gain(Gain_VRO)
+BS.config.V_amplitude = V_stim #100mV excitation
 
-plt.figure(1)
-plt.subplot(211)
-plt.semilogx(freq,gain_mes)
-plt.xlabel('Frequency ($Hz$)')
-plt.ylabel('Impedance ($\Omega$)')
-plt.grid()
-plt.subplot(212)
-plt.semilogx(freq,phase_mes)
-plt.grid()
-plt.xlabel('Frequency ($Hz$)')
-plt.ylabel('Phase ($°$)')
 
+m1 = bm.EIS(fmin=fmin,fmax=fmax,n_pts=n_pts,settling_time=settling_time,NPeriods=NPeriods)
+BS.attach_measure(m1)
+results = BS.measure()
+del BS
+
+plt.figure()
+plt.semilogx(results['freq'],results['mag_Z']) 
+
+
+plt.figure()
+plt.semilogx(results['freq'],results['phase_Z']) 
 plt.show()
 
 

@@ -1,56 +1,39 @@
-"""
-	Python script to perform galvanostat EIS with BIMMS.
-	Authors: Florian Kolbl / Louis Regnacq
-	(c) ETIS - University Cergy-Pontoise
-		IMS - University of Bordeaux
-		CNRS
-
-	Requires:
-		Python 3.6 or higher
-		Analysis_Instrument - class handling Analog Discovery 2 (Digilent)
-
-
-"""
 import bimms as bm
 import numpy as np
 import matplotlib.pyplot as plt
-
-
-fmin = 1000
-fmax = 10e6
-n_pts = 200
-i_amp = 0.01 #in mA
-settling_time = 0.02
-NPeriods = 32
-
-output_file_name = "galvanostat_EIS.csv"
-
+import time
 
 BS = bm.BIMMS()
 
-freq, gain_mes, phase_mes = BS.galvanostatic_EIS(fmin = fmin, fmax = fmax, n_pts = n_pts, I_amp = i_amp, I_offset = 0, settling_time = settling_time, NPeriods = NPeriods,
-	V_range = 10.0, V_offset = 0.0, differential = False,High_gain = True, two_wires = True, coupling = 'DC', DC_feedback = True, apply_cal = True)
+Gain_IRO = 20
+Gain_VRO = 20
+fmin = 1000
+fmax = 1e7
+n_pts = 101
+settling_time = 0.01
+NPeriods = 8
+I_stim = 100 #100uA excitation
+
+BS.config.excitation_mode("G_EIS")
+BS.config.wire_mode("2_WIRE")
+BS.config.excitation_signaling_mode("SE")
+BS.config.excitation_coupling("DC")
+BS.config.G_EIS_gain("HIGH")
+
+BS.config.IRO_gain(Gain_IRO)
+BS.config.VRO_gain(Gain_VRO)
+BS.config.I_amplitude = I_stim #
 
 
-BS.close()
+m1 = bm.EIS(fmin=fmin,fmax=fmax,n_pts=n_pts,settling_time=settling_time,NPeriods=NPeriods)
+BS.attach_measure(m1)
+results = BS.measure()
+del BS
 
-#dump data to csv
-data = np.asarray([freq,gain_mes,phase_mes])
-data = np.transpose(data)
-np.savetxt(output_file_name, data, delimiter=",")
+plt.figure()
+plt.semilogx(results['freq'],results['mag_Z']) 
 
-plt.figure(1)
-plt.subplot(211)
-plt.semilogx(freq,gain_mes)
-plt.grid()
-plt.xlabel('Frequency ($Hz$)')
-plt.ylabel('Impedance ($\Omega$)')
-plt.subplot(212)
-plt.semilogx(freq,phase_mes)
-plt.grid()
-plt.xlabel('Frequency ($Hz$)')
-plt.ylabel('Phase ($°$)')
 
+plt.figure()
+plt.semilogx(results['freq'],results['phase_Z']) 
 plt.show()
-
-

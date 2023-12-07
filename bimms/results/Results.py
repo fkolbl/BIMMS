@@ -87,7 +87,7 @@ class bode_results(BIMMS_results):
     def EIS(self):
         print("WARNING: EIS measure not fully implemented")
         self['mag_Z'] = self['V_readout']/self['I_readout']
-        self['phase_Z'] = self.raw_data['phase_raw']
+        self['phase_Z'] = self.raw_data['phase_raw']-180
 
         
 
