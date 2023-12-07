@@ -21,7 +21,7 @@ pkg_data={
 
 setup(
    name='bimms',
-   version='1.1.1',
+   version='1.1.2',
    description='BIMMS python API',
    long_description = 'file: README.md',
    author='Louis Regnacq - Florian Kolbl - Thomas Couppey',
