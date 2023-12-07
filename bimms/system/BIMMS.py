@@ -58,8 +58,8 @@ class BIMMS(BIMMScalibration):
     def measure(self,clear_mstack = True):
         self.check_config()
         self.set_config()
-        if self.config.config_settling:
-            sleep(self.config.config_settling)
+        if float(self.config.config_settling):
+            sleep(float(self.config.config_settling))
         self.get_awg_parameters()
         self.get_recording_gains()
         if len(self.measures) == 1:
