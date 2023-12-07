@@ -28,7 +28,7 @@ output_file_name = "galvanostat_EIS.csv"
 
 BS = bm.BIMMS()
 
-freq, gain_mes, phase_mes = BS.galvanostat_EIS(fmin = fmin, fmax = fmax, n_pts = n_pts, I_amp = i_amp, I_offset = 0, settling_time = settling_time, NPeriods = NPeriods,
+freq, gain_mes, phase_mes = BS.galvanostatic_EIS(fmin = fmin, fmax = fmax, n_pts = n_pts, I_amp = i_amp, I_offset = 0, settling_time = settling_time, NPeriods = NPeriods,
 	V_range = 10.0, V_offset = 0.0, differential = False,High_gain = True, two_wires = True, coupling = 'DC', DC_feedback = True, apply_cal = True)
 
 

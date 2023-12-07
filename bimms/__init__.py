@@ -10,8 +10,13 @@ __copyright__       = 'Louis Regnacq'
 __license__         = 'CeCILL'
 
 # Public interface
-from .system.BIMMS import *
-from .utils.PostProcessing import *
-from .measure.Measures import *
+from .system.BIMMS import BIMMS
+from .system.BIMMSconfig import BIMMSconfig
+#from .utils.PostProcessing import *
+from .utils.config_mode import config_mode, config_mode_list, config_range
+from .measure.Measure import *
+from .results.Results import *
 from .utils import constants as cst
 from .utils.functions import *
+
+from .backend.BIMMS_Class import BIMMS_class, load_any
