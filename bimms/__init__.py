@@ -9,6 +9,21 @@ __contributors__    = 'Louis Regnacq, Florian Kolbl, Yannick Bornat, Thomas Coup
 __copyright__       = 'Louis Regnacq'
 __license__         = 'CeCILL'
 
+import os
+import inspect
+
+
+# create a dummy object to locate frameworks path
+class DummyClass:
+    """Dummy class"""
+
+    pass
+
+
+bimms_path = os.path.dirname(os.path.abspath(inspect.getsourcefile(DummyClass)))
+if "BIMMS" not in os.environ:
+    os.environ["BIMMS"] = bimms_path
+
 # Public interface
 from .system.BIMMS import BIMMS
 from .system.BIMMSconfig import BIMMSconfig
