@@ -32,23 +32,23 @@ STM32_CS_p = 0
 
 
 ## IA Gain IOs
-CH1_A0_0 = 2**8
-CH1_A1_0 = 2**9
-CH1_A0_1 = 2**10
-CH1_A1_1 = 2**11
+CH1_A0_0 = 8
+CH1_A1_0 = 9
+CH1_A0_1 = 10
+CH1_A1_1 = 11
 
-CH2_A0_0 = 2**12
-CH2_A1_0 = 2**13
-CH2_A0_1 = 2**14
-CH2_A1_1 = 2**15
+CH2_A0_0 = 12
+CH2_A1_0 = 13
+CH2_A0_1 = 14
+CH2_A1_1 = 15
 
 ## LEDs IO
-LED_err = 2**5
-LED_status = 2**4
+LED_err = 5
+LED_status = 4
 
 ## Free IOs
-IO6 = 2**6
-IO7 = 2**7
+IO6 = 6
+IO7 = 7
 
 ## Relay mapping
 Ch1Coupling_rly = 2**0
@@ -92,12 +92,12 @@ IRO_channel = 2
 
 ## BIMMS Board/serial-numbers dictionary
 
-BimmsSerialNumbers = {1: '',\
+BimmsSerialNumbers = {1: 'SN:210321B28CCD',\
                     2: '',\
                     3: 'SN:210321B2825B',\
                     4: 'SN:210321B28C03',\
                     5: 'SN:210321B281BF',\
-                    6: 'SN:210321B28CCD',\
+                    6: '',\
                     7: '',\
                     8: 'SN:210321B2825D',\
                     9: 'SN:210321B28CEB'}

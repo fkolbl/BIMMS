@@ -39,10 +39,7 @@ HardwareVerbose = True
 class BIMMShardware(BIMMSad2):
     @abstractmethod
     def __init__(self, bimms_id=None, serialnumber=None):
-        super().__init__()
-
-        self.__start_STM32_com()
-        self.__relay_state = 0
+        super().__init__(bimms_id=bimms_id, serialnumber=serialnumber)
 
         # Relay states
         self.Ch1Coupling = 0
@@ -88,9 +85,11 @@ class BIMMShardware(BIMMSad2):
         self.IO7_IO = 1
         self.IO6_value = 0
         self.IO7_value = 0
+        
+        self.__DIO_init()
+        self.__start_STM32_com()
+        self.__relay_state = 0
 
-        self.set_DIO_mode()
-        #self.set_DIO_output()
 
     def __start_STM32_com(self):
         self.SPI_init_STM32()
@@ -141,7 +140,7 @@ class BIMMShardware(BIMMSad2):
     def get_board_ID(self):
         ID = self.read_STM32_register(cst.ID_add)
         return ID
-
+    
     def get_config_vector(self):
         vector = 0
         vector += self.Ch1Coupling * cst.Ch1Coupling_rly
@@ -452,125 +451,102 @@ class BIMMShardware(BIMMSad2):
     ## AD2 Digital IO methods for gains control ##
     ##############################################
     def __DIO_init(self):
-        super().__DIO_init()
+        #super().__DIO_init()
         self.set_DIO_mode()
 
     def set_DIO_mode(self):
         IO_vector = 0
-        IO_vector += self.IO6_IO * cst.IO6
-        IO_vector += self.IO7_IO * cst.IO7
-
+        IO_vector += self.IO6_IO * (2**cst.IO6)
+        IO_vector += self.IO7_IO * (2**cst.IO7)
         # LEDs and IA gain IOs are always set as outputs
-        IO_vector += cst.LED_status
-        IO_vector += cst.LED_err
-        IO_vector += cst.CH1_A0_0
-        IO_vector += cst.CH1_A1_0
-        IO_vector += cst.CH1_A0_1
-        IO_vector += cst.CH1_A1_1
-        IO_vector += cst.CH2_A0_0
-        IO_vector += cst.CH2_A1_0
-        IO_vector += cst.CH2_A0_1
-        IO_vector += cst.CH2_A1_1
+        IO_vector += (2**cst.LED_status)
+        IO_vector += (2**cst.LED_err)
+        IO_vector += (2**cst.CH1_A0_0)
+        IO_vector += (2**cst.CH1_A1_0)
+        IO_vector += (2**cst.CH1_A0_1)
+        IO_vector += (2**cst.CH1_A1_1)
+        IO_vector += (2**cst.CH2_A0_0)
+        IO_vector += (2**cst.CH2_A1_0)
+        IO_vector += (2**cst.CH2_A0_1)
+        IO_vector += (2**cst.CH2_A1_1)
         self.IO_vector = IO_vector
         self.ad2.digitalIO_set_as_output(IO_vector)
-
-    def set_DIO_output(self): #Need modifications!!
-        OUTPUT_vector = 0
-        OUTPUT_vector += self.IO6_value * cst.IO6
-        OUTPUT_vector += self.IO7_value * cst.IO7
-        # LEDs and IA gain IOs are always set as outputs
-        OUTPUT_vector += self.LED_status * cst.LED_status
-        OUTPUT_vector += self.LED_err * cst.LED_err
-        OUTPUT_vector += self.CH1_A0_0 * cst.CH1_A0_0
-        OUTPUT_vector += self.CH1_A1_0 * cst.CH1_A1_0
-        OUTPUT_vector += self.CH1_A0_1 * cst.CH1_A0_1
-        OUTPUT_vector += self.CH1_A1_1 * cst.CH1_A1_1
-        OUTPUT_vector += self.CH2_A0_0 * cst.CH2_A0_0
-        OUTPUT_vector += self.CH2_A1_0 * cst.CH2_A1_0
-        OUTPUT_vector += self.CH2_A0_1 * cst.CH2_A0_1
-        OUTPUT_vector += self.CH2_A1_1 * cst.CH2_A1_1
-        self.OUTPUT_vector = OUTPUT_vector
-        self.ad2.digitalIO_output(OUTPUT_vector)
 
     def set_gain_ch1_1(self, value):
         if (value not in cst.gain_IA1):
             print("WARNING: Invalid requested Gain for CH1_1")
             value = 1
         if value == 1:
-            self.CH1_A0_0 = 0
-            self.CH1_A1_0 = 0
+            self.set_IO(cst.CH1_A0_0,0)
+            self.set_IO(cst.CH1_A1_0,0)
         if value == 2:
-            self.CH1_A0_0 = 1
-            self.CH1_A1_0 = 0
+            self.set_IO(cst.CH1_A0_0,1)
+            self.set_IO(cst.CH1_A1_0,0)
         if value == 5:
-            self.CH1_A0_0 = 0
-            self.CH1_A1_0 = 1
+            self.set_IO(cst.CH1_A0_0,0)
+            self.set_IO(cst.CH1_A1_0,1)
         if value == 10:
-            self.CH1_A0_0 = 1
-            self.CH1_A1_0 = 1
+            self.set_IO(cst.CH1_A0_0,1)
+            self.set_IO(cst.CH1_A1_0,1)
         if (HardwareVerbose):
             print("Hardware Info: CH1_1 Gain set to " +str(value))
-        self.set_DIO_output()
 
     def set_gain_ch1_2(self, value):
         if (value not in cst.gain_IA1):
             print("WARNING: Invalid requested Gain for CH1_2")
             value = 1
         if value == 1:
-            self.CH1_A0_1 = 0
-            self.CH1_A1_1 = 0
+            self.set_IO(cst.CH1_A0_1,0)
+            self.set_IO(cst.CH1_A1_1,0)
         if value == 2:
-            self.CH1_A0_1 = 1
-            self.CH1_A1_1 = 0
+            self.set_IO(cst.CH1_A0_1,1)
+            self.set_IO(cst.CH1_A1_1,0)
         if value == 5:
-            self.CH1_A0_1 = 0
-            self.CH1_A1_1 = 1
+            self.set_IO(cst.CH1_A0_1,0)
+            self.set_IO(cst.CH1_A1_1,1)
         if value == 10:
-            self.CH1_A0_1 = 1
-            self.CH1_A1_1 = 1
+            self.set_IO(cst.CH1_A0_1,1)
+            self.set_IO(cst.CH1_A1_1,1)
         if (HardwareVerbose):
             print("Hardware Info: CH1_2 Gain set to " +str(value))
-        self.set_DIO_output()
 
     def set_gain_ch2_1(self, value):
         if (value not in cst.gain_IA1):
             print("WARNING: Invalid requested Gain for CH2_1")
             value = 1
         if value == 1:
-            self.CH2_A0_0 = 0
-            self.CH2_A1_0 = 0
+            self.set_IO(cst.CH2_A0_0,0)
+            self.set_IO(cst.CH2_A1_0,0)
         if value == 2:
-            self.CH2_A0_0 = 1
-            self.CH2_A1_0 = 0
+            self.set_IO(cst.CH2_A0_0,1)
+            self.set_IO(cst.CH2_A1_0,0)
         if value == 5:
-            self.CH2_A0_0 = 0
-            self.CH2_A1_0 = 1
+            self.set_IO(cst.CH2_A0_0,0)
+            self.set_IO(cst.CH2_A1_0,1)
         if value == 10:
-            self.CH2_A0_0 = 1
-            self.CH2_A1_0 = 1
+            self.set_IO(cst.CH2_A0_0,1)
+            self.set_IO(cst.CH2_A1_0,1)
         if (HardwareVerbose):
             print("Hardware Info: CH2_1 Gain set to " +str(value))
-        self.set_DIO_output()
 
     def set_gain_ch2_2(self, value):
         if (value not in cst.gain_IA1):
             print("WARNING: Invalid requested Gain for CH2_2")
             value = 1
         if value == 1:
-            self.CH2_A0_1 = 0
-            self.CH2_A1_1 = 0
+            self.set_IO(cst.CH2_A0_1,0)
+            self.set_IO(cst.CH2_A1_1,0)
         if value == 2:
-            self.CH2_A0_1 = 1
-            self.CH2_A1_1 = 0
+            self.set_IO(cst.CH2_A0_1,1)
+            self.set_IO(cst.CH2_A1_1,0)
         if value == 5:
-            self.CH2_A0_1 = 0
-            self.CH2_A1_1 = 1
+            self.set_IO(cst.CH2_A0_1,0)
+            self.set_IO(cst.CH2_A1_1,1)
         if value == 10:
-            self.CH2_A0_1 = 1
-            self.CH2_A1_1 = 1
+            self.set_IO(cst.CH2_A0_1,1)
+            self.set_IO(cst.CH2_A1_1,1)
         if (HardwareVerbose):
             print("Hardware Info: CH2_2 Gain set to " +str(value))
-        self.set_DIO_output()
 
     #################################
     ## STM32 communitation methods ##

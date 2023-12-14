@@ -22,7 +22,7 @@ BS.config.G_EIS_gain("HIGH")
 
 BS.config.IRO_gain(Gain_IRO)
 BS.config.VRO_gain(Gain_VRO)
-BS.config.I_amplitude = I_stim #
+BS.config.I_amplitude = I_stim 
 
 
 m1 = bm.EIS(fmin=fmin,fmax=fmax,n_pts=n_pts,settling_time=settling_time,NPeriods=NPeriods)

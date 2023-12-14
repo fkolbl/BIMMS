@@ -70,7 +70,6 @@ class BIMMSconfig(BIMMShardware):
         # Other
         self.config.add_mode("config_settling", config_range(0, 100, default=0))
 
-
         #TEST CONFIG (Excitation)
         self.test_config.add_mode("waveform_gen", config_mode("EXTERNAL" ,"INTERNAL", default="INTERNAL"))
         self.test_config.add_mode("excitation_source",  config_mode("CURRENT", "VOLTAGE","NONE", default="NONE"))

@@ -31,6 +31,15 @@ from ..utils import constants as cst
 ### verbosity of the verbosity
 verbose = True
 
+def set_bit(value, bit):
+    return value | (1<<bit)
+
+def clear_bit(value, bit):
+    return value & ~(1<<bit)
+
+def toggle_bit(value, bit):
+    return(value ^  (1<<(bit)))
+
 
 ##############################
 ## CLASS FOR BIMMS HANDLING ##
@@ -42,10 +51,10 @@ class BIMMSad2(BIMMS_class):
         # To maintain connection use keep_on
         self.switch_off = True
         self.ad2_on = False
-
+        
         self.__start_ad2(bimms_id=bimms_id, serialnumber=serialnumber)
         self.__DIO_init()
-
+        
         self.AD2_input_Fs_max = self.ad2.in_frequency_info()[-1]        #Maximum input sampling frequency
         self.AD2_input_buffer_size = self.ad2.in_buffer_size_info()[-1] #Maximum input buffer size 
         available_ranges = self.AD2_get_input_ranges()
@@ -118,11 +127,12 @@ class BIMMSad2(BIMMS_class):
         self.ad2.set_SPI_Data_channel(ai.SPIDataIdx["DQ1_MISO"], miso_p)
         self.ad2.set_SPI_mode(ai.SPIMode["CPOL_1_CPA_1"])
         self.ad2.set_SPI_MSB_first()
-        self.ad2.set_SPI_CS(cs_p, ai.LogicLevel["H"])
+        self.ad2.set_SPI_CS(cs_p, ai.LogicLevel["H"])  
 
     def SPI_write_32(self, cs_p, value):
         """ """
         tx_8bvalues = convert(value)
+        self.ad2.set_SPI_CS(cs_p, ai.LogicLevel["H"])  #required if an other CS pin is also used (ex: tomoBIMMS)
         self.ad2.SPI_select(cs_p, ai.LogicLevel["L"])
         for k in tx_8bvalues:
             self.ad2.SPI_write_one(ai.SPI_cDQ["MOSI/MISO"], 8, k)
@@ -132,6 +142,7 @@ class BIMMSad2(BIMMS_class):
         """ """
         offsets = [2**24, 2**16, 2**8, 2**0]
         value = 0
+        self.ad2.set_SPI_CS(cs_p, ai.LogicLevel["H"])  #required if an other CS pin is also used (ex: tomoBIMMS)
         self.ad2.SPI_select(cs_p, ai.LogicLevel["L"])
         for k in offsets:
             rx = self.ad2.SPI_read_one(ai.SPI_cDQ["MOSI/MISO"], 8)
@@ -144,6 +155,19 @@ class BIMMSad2(BIMMS_class):
     ############################
     def __DIO_init(self):
         self.ad2.configure_digitalIO()
+
+    def set_IO(self,IO_pin,state):
+        IO = self.ad2.digitalIO_read_outputs()
+        if(state==1):
+            IO = set_bit(IO,IO_pin)
+        else:
+            IO = clear_bit(IO,IO_pin)
+        self.ad2.digitalIO_output(IO)
+
+    def toggle_IO(self,IO_pin):
+        IO = self.ad2.digitalIO_read_outputs()
+        IO = toggle_bit(IO,IO_pin)
+        self.ad2.digitalIO_output(IO)
 
     ###################
     ## AD2 Analog IN ##
