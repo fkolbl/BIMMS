@@ -40,8 +40,8 @@ class BIMMSconfig(BIMMShardware):
     def __init__(self, bimms_id=None, serialnumber=None):
         super().__init__(bimms_id=bimms_id, serialnumber=serialnumber)
 
-        self.set_STM32_idle()
-        self.set_STM32_stopped()
+        #self.set_STM32_idle()
+        #self.set_STM32_stopped()
 
         self.config = config_mode_list()
         self.test_config = config_mode_list()
@@ -160,7 +160,6 @@ class BIMMSconfig(BIMMShardware):
         
         """
         if (self.config_mode == "MEASURE"):
-            
             if self.config.wire_mode == "2" or self.config.wire_mode == "2_WIRE":
                 self.set_2_wires_mode()
             else:   # 4
@@ -318,7 +317,7 @@ class BIMMSconfig(BIMMShardware):
             self.enable_current_source()
         else:
             self.disable_current_source()
-    
+
 
     def set_test_excitation_source(self):
         if (self.test_config.excitation_source == "NONE"):

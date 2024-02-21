@@ -33,12 +33,12 @@ class Offsets(Calibrator):
     """
     
     """
-    def __init__(self, fmin=1e3, fmax=1e7, n_pts=101, settling_time=0.001, NPeriods=8, ID=0):
+    def __init__(self, fmin=1e3, fmax=1e7, n_pts=101, settling_time=0.001, nperiods=8, ID=0):
         super().__init__(ID=ID)
         self.fmin = fmin
         self.fmax = fmax
         self.n_pts = n_pts
         self.settling_time = settling_time
-        self.NPeriods = NPeriods
+        self.nperiods = nperiods
 
 

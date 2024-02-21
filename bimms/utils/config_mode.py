@@ -133,21 +133,23 @@ class config_range(config_mode):
         else:
             assert(len(args)==2)
         if is_int_str(args[0]) and is_int_str(args[1]):
-            self.valuetype = int
+            self.valuetype = "int"
         elif is_float_str(args[0]) and is_float_str(args[1]):
-            self.valuetype = float
+            self.valuetype = "float"
         else:
             print("ERROR: config_range argument should be cinvertible in float or int")
             exit()
-        self.min = min(self.valuetype(args[0]), self.valuetype(args[1]))
-        self.max = max(self.valuetype(args[0]), self.valuetype(args[1]))
-
+        self.min = min(self.__convert_val(args[0]), self.__convert_val(args[1]))
+        self.max = max(self.__convert_val(args[0]), self.__convert_val(args[1]))
         super().__init__(*args, **kwargs)
+
+    def __convert_val(self, value):
+        return eval(self.valuetype + "(" + str(value) + ")")
 
     def is_mode(self, obj):
         obj_str = str(obj).upper()
         try:
-            val = self.valuetype(obj_str)
+            val = self.__convert_val(obj_str)
             return val >= self.min and val <= self.max
         except:
             return False

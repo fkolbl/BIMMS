@@ -122,6 +122,7 @@ class BIMMS_class(metaclass=ABCMeta):
         for key in self.__dict__:
             if key not in blacklist:
                 if is_BIMMS_class(self.__dict__[key]):
+                    #print(key)
                     key_dic[key] = self.__dict__[key].save(**kwargs)
                 elif is_BIMMS_class_list(self.__dict__[key]):
                     key_dic[key] = []
