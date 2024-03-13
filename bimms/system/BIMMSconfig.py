@@ -44,8 +44,8 @@ class BIMMSconfig(BIMMShardware):
         #self.set_STM32_stopped()
 
         self.config = config_mode_list()
-        self.test_config = config_mode_list()
-        self.config_mode = config_mode("MEASURE" ,"TEST", default="MEASURE")
+        self.manual_config = config_mode_list()
+        self.config_mode = config_mode("MEASURE" ,"MANUAL", default="MEASURE")
 
         ## Measuremenet
         self.config.add_mode("excitation_sources", config_mode("EXTERNAL" ,"INTERNAL", default="INTERNAL"))
@@ -71,27 +71,27 @@ class BIMMSconfig(BIMMShardware):
         self.config.add_mode("config_settling", config_range(0, 100, default=0))
 
         #TEST CONFIG (Excitation)
-        self.test_config.add_mode("waveform_gen", config_mode("EXTERNAL" ,"INTERNAL", default="INTERNAL"))
-        self.test_config.add_mode("excitation_source",  config_mode("CURRENT", "VOLTAGE","NONE", default="NONE"))
-        self.test_config.add_mode("I_source_gain", config_mode("LOW", "HIGH", default="HIGH"))
-        self.test_config.add_mode("wire_mode",  config_mode("2_WIRE", "4_WIRE", "2", "4",default="2_WIRE"))
-        self.test_config.add_mode("excitation_signaling_mode", config_mode("SE", "DIFF", default="SE"))
-        self.test_config.add_mode("excitation_coupling", config_mode("AC", "DC", default="DC"))
-        self.test_config.add_mode("DC_feedback", config_mode(True, False, default=False))
-        self.test_config.add_mode("Enable_Isource", config_mode(True, False, default=True))
-        self.test_config.add_mode("AWG_amp", config_range(cst.min_AWG_amp, cst.max_AWG_amp, default=cst.min_AWG_amp))
-        self.test_config.add_mode("AWG_offset", config_range(cst.min_AWG_amp, cst.max_AWG_amp, default=cst.min_AWG_amp))
+        self.manual_config.add_mode("waveform_gen", config_mode("EXTERNAL" ,"INTERNAL", default="INTERNAL"))
+        self.manual_config.add_mode("excitation_source",  config_mode("CURRENT", "VOLTAGE","NONE", default="NONE"))
+        self.manual_config.add_mode("I_source_gain", config_mode("LOW", "HIGH", default="HIGH"))
+        self.manual_config.add_mode("wire_mode",  config_mode("2_WIRE", "4_WIRE", "2", "4",default="2_WIRE"))
+        self.manual_config.add_mode("excitation_signaling_mode", config_mode("SE", "DIFF", default="SE"))
+        self.manual_config.add_mode("excitation_coupling", config_mode("AC", "DC", default="DC"))
+        self.manual_config.add_mode("DC_feedback", config_mode(True, False, default=False))
+        self.manual_config.add_mode("Enable_Isource", config_mode(True, False, default=True))
+        self.manual_config.add_mode("AWG_amp", config_range(cst.min_AWG_amp, cst.max_AWG_amp, default=cst.min_AWG_amp))
+        self.manual_config.add_mode("AWG_offset", config_range(cst.min_AWG_amp, cst.max_AWG_amp, default=cst.min_AWG_amp))
 
         #TEST CONFIG (Readout)
-        self.test_config.add_mode("CHx_to_Scopex", config_mode("CH1" ,"CH2","BOTH","NONE", default="NONE"))
-        self.test_config.add_mode("CH1_coupling", config_mode("AC", "DC", default="DC"))
-        self.test_config.add_mode("CH2_coupling", config_mode("AC", "DC", default="DC"))
-        self.test_config.add_mode("TIA_coupling", config_mode("AC", "DC", default="DC"))
-        self.test_config.add_mode("TIA_to_CH2", config_mode(True, False, default=False))
-        self.test_config.add_mode("connect_TIA", config_mode(True, False, default=False))
-        self.test_config.add_mode("TIA_NEG", config_mode("GND" ,"Vneg","Ineg", default="GND"))
-        self.test_config.add_mode("CH1_gain", config_mode(*cst.gain_array.tolist(), default=1))
-        self.test_config.add_mode("CH2_gain", config_mode(*cst.gain_array.tolist(), default=1))
+        self.manual_config.add_mode("CHx_to_Scopex", config_mode("CH1" ,"CH2","BOTH","NONE", default="NONE"))
+        self.manual_config.add_mode("CH1_coupling", config_mode("AC", "DC", default="DC"))
+        self.manual_config.add_mode("CH2_coupling", config_mode("AC", "DC", default="DC"))
+        self.manual_config.add_mode("TIA_coupling", config_mode("AC", "DC", default="DC"))
+        self.manual_config.add_mode("TIA_to_CH2", config_mode(True, False, default=False))
+        self.manual_config.add_mode("connect_TIA", config_mode(True, False, default=False))
+        self.manual_config.add_mode("TIA_NEG", config_mode("GND" ,"Vneg","Ineg", default="GND"))
+        self.manual_config.add_mode("CH1_gain", config_mode(*cst.gain_array.tolist(), default=1))
+        self.manual_config.add_mode("CH2_gain", config_mode(*cst.gain_array.tolist(), default=1))
 
     ####################
     ## Save and load  ##
@@ -167,7 +167,7 @@ class BIMMSconfig(BIMMShardware):
             self.set_exitation_config()
             self.set_recording_config()
         else :
-            self.set_test_config()
+            self.set_manual_config()
 
         # Send the configuration to set the relays
         if (send):
@@ -179,7 +179,7 @@ class BIMMSconfig(BIMMShardware):
     def reset_config(self):
         self.config_mode("MEASURE")
         self.config.reset()
-        self.test_config.reset()
+        self.manual_config.reset()
         self.set_config(send = False)
         print("INFO: BIMMS config reset!")
 
@@ -286,9 +286,9 @@ class BIMMSconfig(BIMMShardware):
     ##  test config methods ##
     #######################################
 
-    def set_test_config(self):
+    def set_manual_config(self):
         print("INFO: BIMMS set to test mode.")
-        if self.test_config.wire_mode == "2" or self.test_config.wire_mode == "2_WIRE":
+        if self.manual_config.wire_mode == "2" or self.manual_config.wire_mode == "2_WIRE":
             self.set_2_wires_mode()
         else:   # 4
             self.set_4_wires_mode()
@@ -297,13 +297,13 @@ class BIMMSconfig(BIMMShardware):
         self.set_test_readout_config()
 
     def set_test_excitation_config(self):
-        if (self.test_config.waveform_gen) == "INTERNAL":
+        if (self.manual_config.waveform_gen) == "INTERNAL":
             self.connect_internal_AWG()
         else:
             self.connect_external_AWG()
 
         self.set_test_excitation_source()
-        if (self.test_config.excitation_coupling == "DC"):
+        if (self.manual_config.excitation_coupling == "DC"):
             self.set_Stim_DC_coupling()
         else:
             self.set_Stim_AC_coupling()
@@ -313,30 +313,30 @@ class BIMMSconfig(BIMMShardware):
         else:   # False
             self.disable_DC_feedback()
         
-        if (self.test_config.Enable_Isource== True):
+        if (self.manual_config.Enable_Isource== True):
             self.enable_current_source()
         else:
             self.disable_current_source()
 
 
     def set_test_excitation_source(self):
-        if (self.test_config.excitation_source == "NONE"):
+        if (self.manual_config.excitation_source == "NONE"):
             self.disconnect_StimNeg()
             self.disconnect_StimPos()
-        elif (self.test_config.excitation_source == "CURRENT"):
+        elif (self.manual_config.excitation_source == "CURRENT"):
             self.connect_Ipos_to_StimPos()
-            if (self.test_config.excitation_signaling_mode == "SE"):
+            if (self.manual_config.excitation_signaling_mode == "SE"):
                 self.connect_GND_to_StimNeg()
             else:
                 self.connect_Ineg_to_StimNeg()
 
-            if (self.test_config.I_source_gain == "LOW"):
+            if (self.manual_config.I_source_gain == "LOW"):
                 self.set_low_gain_current_source()
             else:
                 self.set_high_gain_current_source()
         else: 
             self.connect_Vpos_to_StimPos()
-            if (self.test_config.excitation_signaling_mode == "SE"):
+            if (self.manual_config.excitation_signaling_mode == "SE"):
                 self.connect_GND_to_StimNeg()
             else:
                 self.connect_Vneg_to_StimNeg()
@@ -344,39 +344,39 @@ class BIMMSconfig(BIMMShardware):
     def set_test_readout_config(self):
         self.set_test_CHx_to_SCOPEx()
 
-        self.set_gain_IA(channel=1, gain=int(self.test_config.CH1_gain))
-        self.set_gain_IA(channel=2, gain=int(self.test_config.CH2_gain))
+        self.set_gain_IA(channel=1, gain=int(self.manual_config.CH1_gain))
+        self.set_gain_IA(channel=2, gain=int(self.manual_config.CH2_gain))
 
         self.set_readout_coupling()
         self.connect_TIA()
 
     def connect_TIA(self):
-        if (self.test_config.connect_TIA== True):
+        if (self.manual_config.connect_TIA== True):
 
             self.connect_TIA_to_StimNeg()
 
-        if (self.test_config.TIA_to_CH2==True):
+        if (self.manual_config.TIA_to_CH2==True):
             self.connect_TIA_to_CH2()
         else:
             self.disconnect_TIA_from_CH2()
         
-        if (self.test_config.TIA_NEG == "GND"):
+        if (self.manual_config.TIA_NEG == "GND"):
             self.connect_TIA_Neg_to_ground()
 
-        elif (self.test_config.TIA_NEG == "Vneg"):
+        elif (self.manual_config.TIA_NEG == "Vneg"):
             self.connect_TIA_Neg_to_Vneg()
         
         else:
              self.connect_TIA_Neg_to_Ineg
 
     def set_test_CHx_to_SCOPEx(self):
-        if (self.test_config.CHx_to_Scopex == "NONE"):
+        if (self.manual_config.CHx_to_Scopex == "NONE"):
             self.disconnect_CH2_from_scope_2()
             self.disconnect_CH1_from_scope_1()
-        elif  (self.test_config.CHx_to_Scopex == "CH1"):
+        elif  (self.manual_config.CHx_to_Scopex == "CH1"):
             self.disconnect_CH2_from_scope_2()
             self.connect_CH1_to_scope_1()
-        elif  (self.test_config.CHx_to_Scopex == "CH2"):
+        elif  (self.manual_config.CHx_to_Scopex == "CH2"):
             self.disconnect_CH1_from_scope_1()
             self.connect_CH2_to_scope_2()
         else:
@@ -384,17 +384,17 @@ class BIMMSconfig(BIMMShardware):
             self.connect_CH1_to_scope_1()
 
     def set_readout_coupling(self):
-        if (self.test_config.CH1_coupling == "AC"):
+        if (self.manual_config.CH1_coupling == "AC"):
             self.set_CH1_AC_coupling()
         else:
             self.set_CH1_DC_coupling()
         
-        if (self.test_config.CH2_coupling == "AC"):
+        if (self.manual_config.CH2_coupling == "AC"):
             self.set_CH2_AC_coupling()
         else:
             self.set_CH2_DC_coupling()
 
-        if (self.test_config.TIA_coupling == "AC"):
+        if (self.manual_config.TIA_coupling == "AC"):
             self.set_TIA_AC_coupling()
         else:
             self.set_TIA_DC_coupling()

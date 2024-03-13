@@ -90,6 +90,17 @@ class TemporalSingleFrequency(Measure):
         self.nperiods = nperiods
         self.delay = delay
 
+        self.signal = None
+        self.fs = None
+
+    @property
+    def is_custom(self):
+        return not(self.signal is None or self.fs is None)
+
+    def set_signal(self, sig, fs):
+        self.signal=sig
+        self.fs=fs
+
     def set_freq(self, f):
         self.set_parameters(freq=f)
 
@@ -107,26 +118,32 @@ class TemporalSingleFrequency(Measure):
 
     def measure(self, BS: BIMMScalibration):
         # set the generators
-        BS.AWG_sine(
-            freq=self.freq,
-            amp=BS.awg_amp,
-            activate=False,
-            offset=BS.awg_offset,
-            phase=self.phase,
-            symmetry=self.symmetry,
-        )
         Fs_max = BS.AD2_input_Fs_max
         Npts = BS.AD2_input_buffer_size
-        fs = self.freq * Npts / self.nperiods
+        if self.is_custom:
+            if self.fs > Fs_max:
+                print("Warning: fs is bigger than Fs_max")
+            else:
+                BS.AWG_custom(self.fs, self.signal)
+        else:
+            BS.AWG_sine(
+                freq=self.freq,
+                amp=BS.awg_amp,
+                activate=False,
+                offset=BS.awg_offset,
+                phase=self.phase,
+                symmetry=self.symmetry,
+            )
+            self.fs = self.freq * Npts / self.nperiods
 
-        while fs > Fs_max:
-            Npts -= 1
-            fs = self.freq * Npts / self.nperiods
+            while self.fs > Fs_max:
+                Npts -= 1
+                self.fs = self.freq * Npts / self.nperiods
         # set the triger to triger source
         BS.Set_AWG_trigger(delay=self.delay)
 
         # set acquisition
-        t = BS.set_acquistion(fs, Npts)
+        t = BS.set_acquistion(self.fs, Npts)
 
         # perform the generation/acquisition
         BS.AWG_enable(True)

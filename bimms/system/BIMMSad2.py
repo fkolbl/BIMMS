@@ -203,6 +203,9 @@ class BIMMSad2(BIMMS_class):
     def AWG_sine(self,freq, amp ,offset=0, phase=0 ,symmetry=50,activate = False):
         self.ad2.sine(channel=cst.AD2_AWG_ch, freq=freq, amp=amp,activate = False,offset = offset, phase = phase,
                         symmetry = symmetry)
+
+    def AWG_custom(self, fs, data):
+        self.ad2.custom(channel=cst.AD2_AWG_ch, fs=fs, data=data)
         
     def AWG_enable(self,enable):
         if (enable == True):

@@ -7,7 +7,7 @@ fmin = 1e3
 fmax = 1e6
 n_pts=101
 settling_time=0.001
-NPeriods=8
+nperiods=8
 
 r_l = 1000
 
@@ -24,7 +24,7 @@ BS.config.recording_signaling_mode("SE")
 BS.config.readout_coupling("DC")
 
 
-m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, nperiods=nperiods, ID=0)
 BS.attach_measure(m1)
 results = BS.measure()
 ch1_raw = results['mag_ch1_raw']

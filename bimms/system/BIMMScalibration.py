@@ -79,13 +79,13 @@ class BIMMScalibration(BIMMSconfig):
         if (self.config_mode == "MEASURE"):
             self.cal_ch2_gain = int(self.config.IRO_gain)
         else:
-            self.cal_ch2_gain = int(self.test_config.CH2_gain)
+            self.cal_ch2_gain = int(self.manual_config.CH2_gain)
 
     def get_default_ch1_gain(self):
         if (self.config_mode == "MEASURE"):
             self.cal_ch1_gain = int(self.config.VRO_gain)
         else:
-            self.cal_ch1_gain = int(self.test_config.CH1_gain)
+            self.cal_ch1_gain = int(self.manual_config.CH1_gain)
     
     def get_default_TIA_gain(self):
         self.cal_TIA_gain = cst.TIA_gain_default
@@ -129,8 +129,8 @@ class BIMMScalibration(BIMMSconfig):
             self.awg_amp *= self.awg_gain * unit
 
         else:
-            self.awg_amp = float(self.test_config.AWG_amp)
-            self.awg_offset =  float(self.test_config.AWG_offset)
+            self.awg_amp = float(self.manual_config.AWG_amp)
+            self.awg_offset =  float(self.manual_config.AWG_offset)
         #self.validate_excitation_parameter()
 
 

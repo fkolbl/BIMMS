@@ -11,7 +11,7 @@ fmin = 1000
 fmax = 1e7
 n_pts = 101
 settling_time = 0.01
-NPeriods = 8
+nperiods = 8
 I_stim = 100 #100uA excitation
 
 BS.config.excitation_mode("G_EIS")
@@ -25,7 +25,7 @@ BS.config.VRO_gain(Gain_VRO)
 BS.config.I_amplitude = I_stim 
 
 
-m1 = bm.EIS(fmin=fmin,fmax=fmax,n_pts=n_pts,settling_time=settling_time,NPeriods=NPeriods)
+m1 = bm.EIS(fmin=fmin,fmax=fmax,n_pts=n_pts,settling_time=settling_time,nperiods=nperiods)
 BS.attach_measure(m1)
 results = BS.measure()
 del BS

@@ -14,26 +14,26 @@ test_bode = True
 
 BS = bm.BIMMS()
 
-BS.config_mode("TEST")
+BS.config_mode("MANUAL")
 
-BS.test_config.waveform_gen("INTERNAL")
-BS.test_config.excitation_source("NONE")
-BS.test_config.I_source_gain("HIGH")
-BS.test_config.wire_mode("4_WIRE")
-BS.test_config.excitation_signaling_mode("SE")
-BS.test_config.excitation_coupling("DC")
-BS.test_config.DC_feedback(False)
-BS.test_config.Enable_Isource(True)
+BS.manual_config.waveform_gen("INTERNAL")
+BS.manual_config.excitation_source("NONE")
+BS.manual_config.I_source_gain("HIGH")
+BS.manual_config.wire_mode("4_WIRE")
+BS.manual_config.excitation_signaling_mode("SE")
+BS.manual_config.excitation_coupling("DC")
+BS.manual_config.DC_feedback(False)
+BS.manual_config.Enable_Isource(True)
 
-BS.test_config.CHx_to_Scopex("NONE")
-BS.test_config.CH1_coupling("DC")
-BS.test_config.CH2_coupling("DC")
-BS.test_config.connect_TIA(True)
-BS.test_config.TIA_coupling("DC")
-BS.test_config.TIA_to_CH2(False)
-BS.test_config.TIA_NEG("GND")
-BS.test_config.CH1_gain(1)
-BS.test_config.CH2_gain(1)
+BS.manual_config.CHx_to_Scopex("NONE")
+BS.manual_config.CH1_coupling("DC")
+BS.manual_config.CH2_coupling("DC")
+BS.manual_config.connect_TIA(True)
+BS.manual_config.TIA_coupling("DC")
+BS.manual_config.TIA_to_CH2(False)
+BS.manual_config.TIA_NEG("GND")
+BS.manual_config.CH1_gain(1)
+BS.manual_config.CH2_gain(1)
 
 #offset measure 
 acqu_duration = 1.0
@@ -50,9 +50,9 @@ fmin = 1e3
 fmax = 1e6
 n_pts=101
 settling_time=0.001
-NPeriods=8
+nperiods=8
 
-BS.test_config.AWG_amp(amp_AWG)
+BS.manual_config.AWG_amp(amp_AWG)
 
 if (test_ch1):
     print('======== Channel 1 Test ========')
@@ -60,14 +60,14 @@ if (test_ch1):
     print('- Connect CH1 - to GND')
     input('- Press a Key when ready')
 
-    BS.test_config.CHx_to_Scopex("CH1")
+    BS.manual_config.CHx_to_Scopex("CH1")
     
 
     if (test_offset):
         #MEASURE OFFSET CH1 - DC
         print("===== Offset CH1 - DC Coupling =====")
         for gain in bm.BIMMScst.gain_array:
-            BS.test_config.CH1_gain(gain)
+            BS.manual_config.CH1_gain(gain)
             m1 = bm.Offset(acqu_duration,N_avg)
             BS.attach_measure(m1)
             print("CH1 Gain: "+ str(gain)+ 'V/V')
@@ -82,8 +82,8 @@ if (test_ch1):
         #MEASURE OFFSET CH1 - AC
         print("===== Offset CH1 - AC Coupling =====")
         for gain in bm.BIMMScst.gain_array:
-            BS.test_config.CH1_gain(gain)
-            BS.test_config.CH1_coupling("AC")
+            BS.manual_config.CH1_gain(gain)
+            BS.manual_config.CH1_coupling("AC")
 
             m1 = bm.Offset(acqu_duration,N_avg)
             BS.attach_measure(m1)
@@ -99,10 +99,10 @@ if (test_ch1):
     if (test_single_freq):
         plt.figure()
         print("===== Single Frequency CH1 - DC Coupling =====")
-        BS.test_config.CH1_coupling("DC")
+        BS.manual_config.CH1_coupling("DC")
         for gain in bm.BIMMScst.gain_array:
-            BS.test_config.CH1_gain(gain)
-            m1 = bm.TemporalSingleFrequency(freq = freq_AWG,Nperiod = n_period)
+            BS.manual_config.CH1_gain(gain)
+            m1 = bm.TemporalSingleFrequency(freq = freq_AWG,nperiods = n_period)
             BS.attach_measure(m1)
             print("CH1 Gain: "+ str(gain)+ 'V/V')
             results = BS.measure()
@@ -117,9 +117,9 @@ if (test_ch1):
         plt.figure()
         print("===== Single Frequency CH1 - AC Coupling =====")
         for gain in bm.BIMMScst.gain_array:
-            BS.test_config.CH1_gain(gain)
-            BS.test_config.CH1_coupling("AC")
-            m1 = bm.TemporalSingleFrequency(freq = freq_AWG,Nperiod = n_period)
+            BS.manual_config.CH1_gain(gain)
+            BS.manual_config.CH1_coupling("AC")
+            m1 = bm.TemporalSingleFrequency(freq = freq_AWG,nperiods = n_period)
             BS.attach_measure(m1)
             print("CH1 Gain: "+ str(gain)+ 'V/V')
             results = BS.measure()
@@ -135,9 +135,9 @@ if (test_ch1):
         plt.figure()
         print("===== Bode CH1 - DC Coupling =====")
         for gain in bm.BIMMScst.gain_array:
-            BS.test_config.CH1_gain(gain)
-            BS.test_config.CH1_coupling("DC")
-            m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods)
+            BS.manual_config.CH1_gain(gain)
+            BS.manual_config.CH1_coupling("DC")
+            m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, nperiods=nperiods)
             BS.attach_measure(m1)
             print("CH1 Set Gain: "+ str(gain)+ 'V/V')
             results = BS.measure()
@@ -156,9 +156,9 @@ if (test_ch1):
         plt.figure()
         print("===== Bode CH1 - AC Coupling =====")
         for gain in bm.BIMMScst.gain_array:
-            BS.test_config.CH1_gain(gain)
-            BS.test_config.CH1_coupling("AC")
-            m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods)
+            BS.manual_config.CH1_gain(gain)
+            BS.manual_config.CH1_coupling("AC")
+            m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, nperiods=nperiods)
             BS.attach_measure(m1)
             print("CH1 Set Gain: "+ str(gain)+ 'V/V')
             results = BS.measure()
@@ -174,7 +174,7 @@ if (test_ch1):
         plt.savefig('./hardware_unitary_tests/figures_hardware/001_CHANNEL1_BODE_AC.png')
         plt.close('all')
 
-BS.test_config.CH1_gain(1)
+BS.manual_config.CH1_gain(1)
 
 if (test_ch2):
     print('======== Channel 2 Test ========')
@@ -182,13 +182,13 @@ if (test_ch2):
     print('- Connect CH2 - to GND')
     input('- Press a Key when ready')
 
-    BS.test_config.CHx_to_Scopex("CH2")
+    BS.manual_config.CHx_to_Scopex("CH2")
     if (test_offset):
         #MEASURE OFFSET CH2 - DC
         print("===== Offset CH2 - DC Coupling =====")
         for gain in bm.BIMMScst.gain_array:
-            BS.test_config.CH2_coupling("DC")
-            BS.test_config.CH2_gain(gain)
+            BS.manual_config.CH2_coupling("DC")
+            BS.manual_config.CH2_gain(gain)
             m1 = bm.Offset(acqu_duration,N_avg)
             BS.attach_measure(m1)
             print("CH2 Gain: "+ str(gain)+ 'V/V')
@@ -203,8 +203,8 @@ if (test_ch2):
         #MEASURE OFFSET CH2 - AC
         print("===== Offset CH2 - AC Coupling =====")
         for gain in bm.BIMMScst.gain_array:
-            BS.test_config.CH2_coupling("AC")
-            BS.test_config.CH2_gain(gain)
+            BS.manual_config.CH2_coupling("AC")
+            BS.manual_config.CH2_gain(gain)
             m1 = bm.Offset(acqu_duration,N_avg)
             BS.attach_measure(m1)
             print("CH2 Gain: "+ str(gain)+ 'V/V')
@@ -219,10 +219,10 @@ if (test_ch2):
     if (test_single_freq):
         plt.figure()
         print("===== Single Frequency CH2 - DC Coupling =====")
-        BS.test_config.CH2_coupling("DC")
+        BS.manual_config.CH2_coupling("DC")
         for gain in bm.BIMMScst.gain_array:
-            BS.test_config.CH2_gain(gain)
-            m1 = bm.TemporalSingleFrequency(freq = freq_AWG,Nperiod = n_period)
+            BS.manual_config.CH2_gain(gain)
+            m1 = bm.TemporalSingleFrequency(freq = freq_AWG,nperiods = n_period)
             BS.attach_measure(m1)
             print("CH2 Gain: "+ str(gain)+ 'V/V')
             results = BS.measure()
@@ -236,9 +236,9 @@ if (test_ch2):
         plt.figure()
         print("===== Single Frequency CH2 - AC Coupling =====")
         for gain in bm.BIMMScst.gain_array:
-            BS.test_config.CH2_gain(gain)
-            BS.test_config.CH2_coupling("AC")
-            m1 = bm.TemporalSingleFrequency(freq = freq_AWG,Nperiod = n_period)
+            BS.manual_config.CH2_gain(gain)
+            BS.manual_config.CH2_coupling("AC")
+            m1 = bm.TemporalSingleFrequency(freq = freq_AWG,nperiods = n_period)
             BS.attach_measure(m1)
             print("CH2 Gain: "+ str(gain)+ 'V/V')
             results = BS.measure()
@@ -254,9 +254,9 @@ if (test_ch2):
         plt.figure()
         print("===== Bode CH2 - DC Coupling =====")
         for gain in bm.BIMMScst.gain_array:
-            BS.test_config.CH2_gain(gain)
-            BS.test_config.CH2_coupling("DC")
-            m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods)
+            BS.manual_config.CH2_gain(gain)
+            BS.manual_config.CH2_coupling("DC")
+            m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, nperiods=nperiods)
             BS.attach_measure(m1)
             print("CH2 Set Gain: "+ str(gain)+ 'V/V')
             results = BS.measure()
@@ -275,9 +275,9 @@ if (test_ch2):
         plt.figure()
         print("===== Bode CH2 - AC Coupling =====")
         for gain in bm.BIMMScst.gain_array:
-            BS.test_config.CH2_gain(gain)
-            BS.test_config.CH2_coupling("AC")
-            m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods)
+            BS.manual_config.CH2_gain(gain)
+            BS.manual_config.CH2_coupling("AC")
+            m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, nperiods=nperiods)
             BS.attach_measure(m1)
             print("CH2 Set Gain: "+ str(gain)+ 'V/V')
             results = BS.measure()

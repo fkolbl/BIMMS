@@ -12,27 +12,27 @@ test_single_freq = True
 test_bode = True
 
 BS = bm.BIMMS()
-BS.config_mode("TEST")
+BS.config_mode("MANUAL")
 
 
-BS.test_config.waveform_gen("INTERNAL")
-BS.test_config.excitation_source("VOLTAGE")
-BS.test_config.I_source_gain("HIGH")
-BS.test_config.wire_mode("2_WIRE")
-BS.test_config.excitation_signaling_mode("SE")
-BS.test_config.excitation_coupling("DC")
-BS.test_config.DC_feedback(False)
-BS.test_config.Enable_Isource(True)
+BS.manual_config.waveform_gen("INTERNAL")
+BS.manual_config.excitation_source("VOLTAGE")
+BS.manual_config.I_source_gain("HIGH")
+BS.manual_config.wire_mode("2_WIRE")
+BS.manual_config.excitation_signaling_mode("SE")
+BS.manual_config.excitation_coupling("DC")
+BS.manual_config.DC_feedback(False)
+BS.manual_config.Enable_Isource(True)
 
-BS.test_config.CHx_to_Scopex("CH1")
-BS.test_config.CH1_coupling("DC")
-BS.test_config.CH2_coupling("DC")
-BS.test_config.TIA_coupling("DC")
-BS.test_config.connect_TIA(False)
-BS.test_config.TIA_to_CH2(False)
-BS.test_config.TIA_NEG("GND")
-BS.test_config.CH1_gain(1)
-BS.test_config.CH2_gain(1)
+BS.manual_config.CHx_to_Scopex("CH1")
+BS.manual_config.CH1_coupling("DC")
+BS.manual_config.CH2_coupling("DC")
+BS.manual_config.TIA_coupling("DC")
+BS.manual_config.connect_TIA(False)
+BS.manual_config.TIA_to_CH2(False)
+BS.manual_config.TIA_NEG("GND")
+BS.manual_config.CH1_gain(1)
+BS.manual_config.CH2_gain(1)
 
 
 
@@ -45,19 +45,19 @@ N_avg = 2
 freq_AWG = 1e3
 n_period = 5
 amp_AWG = 0.1
-BS.test_config.AWG_amp(amp_AWG)
+BS.manual_config.AWG_amp(amp_AWG)
 
 #bode 
 fmin = 1e3
 fmax = 1e6
 n_pts=101
 settling_time=0.001
-NPeriods=8
+nperiods=8
 
 if (test_offset):
     print("===== Offset Voltage Source - SE-DC Coupling =====")
-    BS.test_config.excitation_coupling("DC")
-    BS.test_config.excitation_signaling_mode("SE")
+    BS.manual_config.excitation_coupling("DC")
+    BS.manual_config.excitation_signaling_mode("SE")
     m1 = bm.Offset(acqu_duration,N_avg)
     BS.attach_measure(m1)
     results = BS.measure()
@@ -69,8 +69,8 @@ if (test_offset):
             raise Exception("Measured offset out of range")
 
     print("===== Offset Voltage Source - SE-AC Coupling =====")
-    BS.test_config.excitation_coupling("AC")
-    BS.test_config.excitation_signaling_mode("SE")
+    BS.manual_config.excitation_coupling("AC")
+    BS.manual_config.excitation_signaling_mode("SE")
     m1 = bm.Offset(acqu_duration,N_avg)
     BS.attach_measure(m1)
     results = BS.measure()
@@ -82,8 +82,8 @@ if (test_offset):
             raise Exception("Measured offset out of range")
 
     print("===== Offset Voltage Source - DIFF-DC Coupling =====")
-    BS.test_config.excitation_coupling("DC")
-    BS.test_config.excitation_signaling_mode("DIFF")
+    BS.manual_config.excitation_coupling("DC")
+    BS.manual_config.excitation_signaling_mode("DIFF")
     m1 = bm.Offset(acqu_duration,N_avg)
     BS.attach_measure(m1)
     results = BS.measure()
@@ -95,8 +95,8 @@ if (test_offset):
             raise Exception("Measured offset out of range")
 
     print("===== Offset Voltage Source - DIFF-AC Coupling =====")
-    BS.test_config.excitation_coupling("AC")
-    BS.test_config.excitation_signaling_mode("DIFF")
+    BS.manual_config.excitation_coupling("AC")
+    BS.manual_config.excitation_signaling_mode("DIFF")
     m1 = bm.Offset(acqu_duration,N_avg)
     BS.attach_measure(m1)
     results = BS.measure()
@@ -111,9 +111,9 @@ if (test_offset):
 if (test_single_freq):
     plt.figure()
     print("===== Single Frequency - SE-DC Coupling =====")
-    BS.test_config.excitation_coupling("DC")
-    BS.test_config.excitation_signaling_mode("SE")
-    m1 = bm.TemporalSingleFrequency(freq = freq_AWG,Nperiod = n_period)
+    BS.manual_config.excitation_coupling("DC")
+    BS.manual_config.excitation_signaling_mode("SE")
+    m1 = bm.TemporalSingleFrequency(freq = freq_AWG,nperiods = n_period)
     BS.attach_measure(m1)
     results = BS.measure()
     ch1 = results['chan1_raw']
@@ -121,9 +121,9 @@ if (test_single_freq):
     plt.plot(t,ch1, label = "SE-DC")
 
     print("===== Single Frequency - SE-AC Coupling =====")
-    BS.test_config.excitation_coupling("AC")
-    BS.test_config.excitation_signaling_mode("SE")
-    m1 = bm.TemporalSingleFrequency(freq = freq_AWG,Nperiod = n_period)
+    BS.manual_config.excitation_coupling("AC")
+    BS.manual_config.excitation_signaling_mode("SE")
+    m1 = bm.TemporalSingleFrequency(freq = freq_AWG,nperiods = n_period)
     BS.attach_measure(m1)
     results = BS.measure()
     ch1 = results['chan1_raw']
@@ -131,9 +131,9 @@ if (test_single_freq):
     plt.plot(t,ch1, label = "SE-AC")
 
     print("===== Single Frequency - DIFF-DC Coupling =====")
-    BS.test_config.excitation_coupling("DC")
-    BS.test_config.excitation_signaling_mode("DIFF")
-    m1 = bm.TemporalSingleFrequency(freq = freq_AWG,Nperiod = n_period)
+    BS.manual_config.excitation_coupling("DC")
+    BS.manual_config.excitation_signaling_mode("DIFF")
+    m1 = bm.TemporalSingleFrequency(freq = freq_AWG,nperiods = n_period)
     BS.attach_measure(m1)
     results = BS.measure()
     ch1 = results['chan1_raw']
@@ -141,9 +141,9 @@ if (test_single_freq):
     plt.plot(t,ch1, label = "DIFF-DC")
 
     print("===== Single Frequency - DIFF-AC Coupling =====")
-    BS.test_config.excitation_coupling("AC")
-    BS.test_config.excitation_signaling_mode("DIFF")
-    m1 = bm.TemporalSingleFrequency(freq = freq_AWG,Nperiod = n_period)
+    BS.manual_config.excitation_coupling("AC")
+    BS.manual_config.excitation_signaling_mode("DIFF")
+    m1 = bm.TemporalSingleFrequency(freq = freq_AWG,nperiods = n_period)
     BS.attach_measure(m1)
     results = BS.measure()
     ch1 = results['chan1_raw']
@@ -156,9 +156,9 @@ if (test_single_freq):
 if (test_bode):
     plt.figure()
     print("===== Bode - SE-DC Coupling =====")
-    BS.test_config.excitation_coupling("DC")
-    BS.test_config.excitation_signaling_mode("SE")
-    m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+    BS.manual_config.excitation_coupling("DC")
+    BS.manual_config.excitation_signaling_mode("SE")
+    m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, nperiods=nperiods, ID=0)
     BS.attach_measure(m1)
     results = BS.measure()
     mag_ch1 = results['mag_ch1_raw']
@@ -171,9 +171,9 @@ if (test_bode):
             raise Exception("Measured VCVS gain out of tol")
 
     print("===== Bode - SE-AC Coupling =====")
-    BS.test_config.excitation_coupling("AC")
-    BS.test_config.excitation_signaling_mode("SE")
-    m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+    BS.manual_config.excitation_coupling("AC")
+    BS.manual_config.excitation_signaling_mode("SE")
+    m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, nperiods=nperiods, ID=0)
     BS.attach_measure(m1)
     results = BS.measure()
     mag_ch1 = results['mag_ch1_raw']
@@ -186,9 +186,9 @@ if (test_bode):
             raise Exception("Measured VCVS gain out of tol")
 
     print("===== Bode - DIFF-DC Coupling =====")
-    BS.test_config.excitation_coupling("DC")
-    BS.test_config.excitation_signaling_mode("DIFF")
-    m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+    BS.manual_config.excitation_coupling("DC")
+    BS.manual_config.excitation_signaling_mode("DIFF")
+    m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, nperiods=nperiods, ID=0)
     BS.attach_measure(m1)
     results = BS.measure()
     mag_ch1 = results['mag_ch1_raw']
@@ -201,9 +201,9 @@ if (test_bode):
             raise Exception("Measured VCVS gain out of tol")
 
     print("===== Bode - DIFF-AC Coupling =====")
-    BS.test_config.excitation_coupling("AC")
-    BS.test_config.excitation_signaling_mode("DIFF")
-    m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, NPeriods=NPeriods, ID=0)
+    BS.manual_config.excitation_coupling("AC")
+    BS.manual_config.excitation_signaling_mode("DIFF")
+    m1 = bm.Bode(fmin=fmin, fmax=fmax, n_pts=n_pts, settling_time=settling_time, nperiods=nperiods, ID=0)
     BS.attach_measure(m1)
     results = BS.measure()
     mag_ch1 = results['mag_ch1_raw']
