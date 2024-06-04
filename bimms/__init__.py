@@ -2,7 +2,7 @@
 
 # Meta information
 __title__           = 'BIMMS'
-__version__         = '1.1.2'
+__version__         = '1.1.3'
 __date__            = '2021–07–12'
 __author__          = 'Louis Regnacq'
 __contributors__    = 'Louis Regnacq, Florian Kolbl, Yannick Bornat, Thomas Couppey'
