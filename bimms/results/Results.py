@@ -93,16 +93,28 @@ class bode_results(BIMMS_results):
 
     def update(self, __m, **kwargs) -> None:
         if isinstance(__m, bode_results):
-            self["freq"] = np.concatenate([self["freq"], __m["freq"]])
-            self["mag_ch1_raw"] = np.concatenate(
-                [self["mag_ch1_raw"], __m["mag_ch1_raw"]]
-            )
-            self["mag_ch2_raw"] = np.concatenate(
-                [self["mag_ch2_raw"], __m["mag_ch2_raw"]]
-            )
-            self["phase_raw"] = np.concatenate([self["phase_raw"], __m["phase_raw"]])
-            self["V_readout"] = np.concatenate([self["V_readout"], __m["V_readout"]])
-            self["I_readout"] = np.concatenate([self["I_readout"], __m["I_readout"]])
+            if len(__m["freq"]) == 1:
+                self["freq"] = np.concatenate([self["freq"], __m["freq"]])
+                self["mag_ch1_raw"] = np.concatenate(
+                    [self["mag_ch1_raw"], __m["mag_ch1_raw"]]
+                )
+                self["mag_ch2_raw"] = np.concatenate(
+                    [self["mag_ch2_raw"], __m["mag_ch2_raw"]]
+                )
+                self["phase_raw"] = np.concatenate([self["phase_raw"], __m["phase_raw"]])
+                self["V_readout"] = np.concatenate([self["V_readout"], __m["V_readout"]])
+                self["I_readout"] = np.concatenate([self["I_readout"], __m["I_readout"]])
+
+            else:
+                self["mag_ch1_raw"] = np.vstack(
+                    [self["mag_ch1_raw"], __m["mag_ch1_raw"]]
+                )
+                self["mag_ch2_raw"] = np.vstack(
+                    [self["mag_ch2_raw"], __m["mag_ch2_raw"]]
+                )
+                self["phase_raw"] = np.vstack([self["phase_raw"], __m["phase_raw"]])
+                self["V_readout"] = np.vstack([self["V_readout"], __m["V_readout"]])
+                self["I_readout"] = np.vstack([self["I_readout"], __m["I_readout"]])
         else:
             super().update(__m, **kwargs)
 

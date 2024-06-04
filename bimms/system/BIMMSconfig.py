@@ -96,7 +96,7 @@ class BIMMSconfig(BIMMShardware):
     ####################
     ## Save and load  ##
     ####################
-    def save_config(self, save=False, fname="bimms_config.json", blacklist=[], **kwargs):
+    def save_config(self, save=False, fname="bimms_config.json", blacklist=[], manual=False, **kwargs):
         """
         Save the bimms the configuration
 
@@ -109,9 +109,13 @@ class BIMMSconfig(BIMMShardware):
         **kwargs : dict, optional
             Additional arguments to be passed to the save method of the BIMMS object
         """
-        self.config.save(save=save, fname=fname, **kwargs)
+        if not manual:
+            self.config.save(save=save, fname=fname, **kwargs)
+        else:
+            self.config_mode("MANUAL")
+            self.manual_config.save(save=save, fname=fname, **kwargs)
 
-    def load(self, data, blacklist={}, **kwargs):
+    def load_config(self, data, blacklist={}, manual=False, **kwargs):
         """
         Load the bimms the configuration
 
@@ -124,7 +128,11 @@ class BIMMSconfig(BIMMShardware):
         **kwargs : dict, optional
             Additional arguments to be passed to the load method of the BIMMS object
         """
-        self.config.load(data, blacklist, **kwargs)
+        if not manual:
+            self.config.load(data, blacklist, **kwargs)
+        else:
+            self.config_mode("MANUAL")
+            self.manual_config.load(data, blacklist, **kwargs)
 
     ##############################################
     ## AD2 Digital IO methods for gains control ##
